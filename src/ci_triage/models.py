@@ -33,6 +33,7 @@ class FailureCategory(StrEnum):
     ENVIRONMENT = "environment"
     INFRASTRUCTURE = "infrastructure"
 
+
 def parse_run(payload: dict) -> Run:
     return Run(
         id=payload["id"],
@@ -40,8 +41,10 @@ def parse_run(payload: dict) -> Run:
         event=payload["event"],
     )
 
+
 class Run(BaseModel):
     """One CI workflow run."""
+
     id: int
     repo: str
     head_repo: str
@@ -52,7 +55,7 @@ class Run(BaseModel):
     jobs_url: str
     logs_url: str
     branch: str
-    run_attempt: int 
+    run_attempt: int
     previous_attempt_url: str | None = None
     commit_sha: str
     conclusion: Conclusion
