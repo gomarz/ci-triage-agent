@@ -2,7 +2,11 @@ from datetime import UTC, datetime
 
 from ci_triage.models import Conclusion, Failure, FailureCategory, Run
 
-#The helper exists so each test doesn't repeat sixteen lines, but it also means every model change breaks every test using it. That's the cost of shared fixtures, and it's usually worth paying. The alternative is that model drift goes unnoticed, which is worse.
+
+# The helper exists so each test doesn't repeat sixteen lines
+# but it also means every model change breaks every test using it. 
+# That's the cost of shared fixtures, and it's usually worth paying. 
+# The alternative is that model drift goes unnoticed, which is worse.
 def _run(conclusion: Conclusion) -> Run:
     now = datetime.now(UTC)
     return Run(

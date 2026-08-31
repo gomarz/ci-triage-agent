@@ -1,4 +1,4 @@
-from .models import Conclusion, Run
+from .models import Run
 
 
 def parse_run(payload: dict) -> Run:
