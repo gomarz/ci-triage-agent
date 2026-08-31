@@ -33,18 +33,31 @@ class FailureCategory(StrEnum):
     ENVIRONMENT = "environment"
     INFRASTRUCTURE = "infrastructure"
 
+def parse_run(payload: dict) -> Run:
+    return Run(
+        id=payload["id"],
+        repo=payload["repository"]["full_name"],
+        event=payload["event"],
+    )
 
 class Run(BaseModel):
     """One CI workflow run."""
-
-    id: str
+    id: int
     repo: str
-    workflow: str
+    head_repo: str
+    workflow_id: int
+    workflow_name: str
+    event: str
+    status: str
+    jobs_url: str
+    logs_url: str
     branch: str
+    run_attempt: int 
+    previous_attempt_url: str | None = None
     commit_sha: str
     conclusion: Conclusion
-    started_at: datetime
-    url: str | None = None
+    created_at: datetime
+    api_url: str | None = None
 
     @property
     def failed(self) -> bool:
