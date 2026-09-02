@@ -1,4 +1,18 @@
+import json
+from pathlib import Path
+
+import httpx
+
 from .models import Run
+
+RAW_DIR = Path("data/raw/runs")
+
+
+def cache_payload(payload: dict, raw_dir: Path = RAW_DIR) -> Path:
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    path = raw_dir / f"{payload['id']}.json"
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return path
 
 
 def parse_run(payload: dict) -> Run:
@@ -21,5 +35,14 @@ def parse_run(payload: dict) -> Run:
         run_started_at=payload["run_started_at"],
         api_url=payload["url"],
     )
-    print(run)
     return run
+
+
+def fetch_failed_runs(repo: str, token: str) -> list[dict]:
+    response = httpx.get(
+        f"https://api.github.com/repos/{repo}/actions/runs",
+        params={"status": "failure", "per_page": 100},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    response.raise_for_status()
+    return response.json()["workflow_runs"]
