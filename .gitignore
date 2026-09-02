@@ -13,6 +13,7 @@ dist/
 .ruff_cache/
 .coverage
 htmlcov/
+data/
 
 # AWS CDK
 cdk.out/
