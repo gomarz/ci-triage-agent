@@ -29,15 +29,19 @@ def _run(conclusion: Conclusion) -> Run:
 
 
 def test_successful_run_is_not_failed():
-    assert _run(Conclusion.SUCCESS).failed is False
+    assert _run(Conclusion.SUCCESS).triageable is False
 
 
-def test_non_success_conclusions_count_as_failed():
-    for conclusion in (Conclusion.FAILURE, Conclusion.CANCELLED, Conclusion.TIMED_OUT):
-        assert _run(conclusion).failed is True
+def test_triageable_conclusions():
+    """Cancelled and skipped runs are not failures worth triaging: a human
+    killed the first and the second never executed."""
+    for conclusion in (Conclusion.FAILURE, Conclusion.TIMED_OUT):
+        assert _run(conclusion).triageable is True
+    for conclusion in (Conclusion.SUCCESS, Conclusion.CANCELLED, Conclusion.SKIPPED):
+        assert _run(conclusion).triageable is False
 
 
 def test_failures_start_untriaged():
-    failure = Failure(run_id="1", job_name="test")
+    failure = Failure(run_id=1, job_id=2, job_name="test")
     assert failure.category is FailureCategory.UNTRIAGED
     assert failure.signature is None

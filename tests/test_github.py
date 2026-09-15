@@ -25,7 +25,7 @@ def test_parses_core_fields(runs_payload):
 def test_converts_conclusion_to_enum(runs_payload):
     run = parse_run(runs_payload[0])
     assert run.conclusion is Conclusion.FAILURE
-    assert run.failed is True
+    assert run.triageable is True
 
 
 def test_fork_run_has_different_head_repo(runs_payload):
