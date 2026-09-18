@@ -40,10 +40,14 @@ _HAS_LETTERS = re.compile(r"[A-Za-z]{3}")
 #: opening line hands the next line of the same payload back as a root.
 _QUOTED_PAYLOAD = re.compile(r"^['\"*\-]\s*\S")
 
+_MEANINGFUL_DESCRIPTORS = ("!=", "does not", "was not", "not found")
+
 
 def _is_meaningful(text: str) -> bool:
     """Whether an extracted root says anything about what broke."""
     text = text.strip()
+    if any(w in text for w in _MEANINGFUL_DESCRIPTORS):
+        return True
     return len(text) >= _MIN_ROOT_LEN and bool(_HAS_LETTERS.search(text))
 
 
@@ -156,6 +160,8 @@ def root_cause(message: str) -> tuple[str, str]:
         if not candidate:
             continue
         if _QUOTED_PAYLOAD.match(candidate):
+            if any(w in candidate for w in _MEANINGFUL_DESCRIPTORS):
+                return candidate, FALLBACK_RULE
             # The message opens with compared content, so the whole message
             # is content. Later lines belong to the same payload.
             return "", UNCLASSIFIED

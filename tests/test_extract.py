@@ -287,3 +287,15 @@ def test_payload_continuation_lines_are_not_roots():
 
 def test_bullet_payloads_are_not_roots():
     assert root_rule("* Version: 7.5b2.dev1\n* Another line") == UNCLASSIFIED
+
+
+def test_numeric_assertions_are_roots():
+    assert root_rule("1 != 252") != UNCLASSIFIED
+
+
+def test_quoted_values_with_a_verb_are_roots():
+    assert root_rule("'/a/b.html' was not created in 10 seconds.") != UNCLASSIFIED
+
+
+def test_markup_payloads_stay_unclassified():
+    assert root_rule("'<p>Library documentation in <em>Markdown</em>.</p>") == UNCLASSIFIED

@@ -102,9 +102,9 @@ def read_log(path: Path) -> str:
     """
     # newline="" on the reader, not read_text(newline=...), which is 3.13+
     # and would pass locally while failing on the 3.11 CI matrix.
-    with path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
+    with path.open("r", encoding="utf-8-sig", errors="replace", newline="") as handle:
         raw = handle.read()
-    return raw.replace("\r\r\n", "\n").replace("\r\n", "\n").replace("\r", "\n")
+    return raw.strip("\ufeff").replace("\r\r\n", "\n").replace("\r\n", "\n").replace("\r", "\n")
 
 
 def strip_timestamps(text: str) -> str:
