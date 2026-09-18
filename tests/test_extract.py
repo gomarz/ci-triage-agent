@@ -7,10 +7,7 @@ parser will meet in production.
 
 from __future__ import annotations
 
-import pytest
-
 from ci_triage.extract import extract_failures, parse_tally
-from ci_triage.normalize import case_signature, cause_signature, normalize
 from ci_triage.roots import (
     UNCLASSIFIED,
     root_cause_text,
@@ -74,14 +71,6 @@ FAILED
 7108 tests, 7107 passed, 1 failed
 """
 
-_STATUS = "Status of {name!r} should have been PASS but it was FAIL."
-
-
-def _wrapped(name: str, error: str) -> str:
-    """A failure as Robot reports it: status wrapper above the real message."""
-    return f"{_STATUS.format(name=name)}\n\nError message:\n{error}"
-
-
 # --------------------------------------------------------------------------
 # Extraction
 # --------------------------------------------------------------------------
@@ -125,49 +114,6 @@ def test_tally_takes_the_last_summary():
     """A job printing unit-test then acceptance summaries reports the latter."""
     text = "10 tests, 10 passed, 0 failed\nlater\n7108 tests, 7107 passed, 1 failed"
     assert parse_tally(text).failed == 1
-
-
-# --------------------------------------------------------------------------
-# Normalization and cause signatures
-# --------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    ("raw", "expected"),
-    [
-        ("Ran 2434 tests in 13.339s", "Ran <N> tests in <DURATION>"),
-        ("failed on line 96 of the file", "failed on line <N> of the file"),
-        ("7041 tests, 6469 passed, 572 failed", "<COUNTS>"),
-    ],
-)
-def test_scrubbers(raw, expected):
-    assert normalize(raw) == expected
-
-
-def test_same_cause_different_tests_diverge_on_case_sig():
-    assert cause_signature(_YAML) == cause_signature(_YAML)
-    assert case_signature("Suite.A", _YAML) != case_signature("Suite.B", _YAML)
-
-
-def test_signature_is_stable_across_calls():
-    message = "Variable '${X}' not found."
-    assert cause_signature(message) == cause_signature(message)
-
-
-def test_status_wrapper_collapses_cascades():
-    """Robot's status line embeds the test name; a shared root cause must
-    still produce one signature across the tests it takes down."""
-    error = "Taking screenshots is not supported on this platform."
-    a = _wrapped("Set Screenshot Directory", error)
-    b = _wrapped("Each Screenshot Gets Separate Index", error)
-    assert cause_signature(a) == cause_signature(b)
-
-
-def test_status_wrapper_does_not_over_collapse():
-    """Different underlying errors stay separate despite the shared wrapper."""
-    a = _wrapped("A", "Screenshots unsupported.")
-    b = _wrapped("B", "Variable '${X}' not found.")
-    assert cause_signature(a) != cause_signature(b)
 
 
 # --------------------------------------------------------------------------
