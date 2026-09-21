@@ -18,16 +18,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
+
+      - name: Install Poetry
+        run: pipx install poetry
 
       - name: Install
-        run: pip install -e ".[dev]"
+        run: poetry install
 
       - name: Lint
-        run: ruff check .
+        run: poetry run ruff check .
 
       - name: Format check
-        run: ruff format --check .
+        run: poetry run ruff format --check .
 
       - name: Test
-        run: pytest -v
+        run: poetry run pytest -v

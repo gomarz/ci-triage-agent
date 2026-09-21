@@ -127,18 +127,15 @@ A high fix rate with a high cheat rate is a failure, not a success.
 
 ## Development
 
-Requires Python 3.11+.
+Requires Python 3.11+ and [Poetry](https://python-poetry.org/docs/#installation) 2.x.
 
 ```bash
-# macOS / Linux
-python -m venv .venv \&\& source .venv/bin/activate
-
-# Windows
-py -3.12 -m venv .venv \&\& .venv\\Scripts\\activate
-
-pip install -e ".\[dev]"
-ruff check . \&\& pytest
+poetry env use 3.12     # optional: CI runs 3.11 and 3.12
+poetry install
+poetry run ruff check . && poetry run pytest
 ```
+
+Use `poetry run <cmd>` or `poetry env activate` for the commands below.
 
 Copy `.env.example` to `.env` and fill in a GitHub token with `actions:read`
 before running ingestion.
