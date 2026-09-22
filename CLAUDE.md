@@ -33,8 +33,9 @@ file.
 ## Commands
 
 ```
-python -m pytest tests -q
-ruff check . && ruff format --check .
+poetry install                               # once; .venv is in-project, Python 3.12
+poetry run pytest tests -q
+poetry run ruff check . && poetry run ruff format --check .
 
 python scripts/check_log_availability.py     # survey cache before fetching
 python scripts/fetch_logs.py                 # resumable; skips cached
@@ -88,7 +89,7 @@ job's tally reported 764% coverage.
 **Don't name a module-level function `test_*`.** pytest collects imported
 names, so `test_signature` was collected as a test. It's `case_signature`.
 
-**Local Python is 3.14; CI runs 3.11 and 3.12.** `Path.read_text(newline=)`
+**Machine Python is 3.14, but the Poetry venv is pinned to 3.12; CI runs 3.11 and 3.12.** `Path.read_text(newline=)`
 is 3.13+. Passing locally means nothing.
 
 ## Conventions
