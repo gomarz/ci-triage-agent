@@ -7,9 +7,12 @@ parser will meet in production.
 
 from __future__ import annotations
 
+import pytest
+
 from ci_triage.extract import extract_failures, parse_tally
 from ci_triage.roots import (
     UNCLASSIFIED,
+    root_cause,
     root_cause_text,
     root_rule,
     root_signature,
@@ -135,6 +138,32 @@ def test_root_merges_across_platforms():
     assert root_signature(f"Setup failed:\n{_WIN_YAML_FAIL}") == root_signature(
         f"Setup failed:\n{_NIX_YAML_FAIL}"
     )
+
+
+@pytest.mark.parametrize(
+    "wrapper",
+    [
+        "Setup failed:",
+        "Teardown failed:",
+        "Suite setup failed:",
+        "Suite teardown failed:",
+        "Parent suite setup failed:",
+        "Parent suite teardown failed:",
+    ],
+)
+def test_every_setup_teardown_wrapper_is_peeled(wrapper):
+    """Robot capitalises only the first word, so these are all different strings.
+
+    "Parent suite setup failed:" was the root of 959 failures, with the
+    real cause on the line beneath it.
+    """
+    missing = "Source file '/tmp/robotatest/Python-3.10.21-Linux/output/output.xml' does not exist."
+    message = f"{wrapper}\n{missing}"
+
+    root, rule = root_cause(message)
+
+    assert root == "Source file '<PATH>/<ARTIFACT>' does not exist."
+    assert rule == "first-line"
 
 
 def test_root_merges_variable_names():
