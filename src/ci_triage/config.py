@@ -1,6 +1,10 @@
 """Runtime configuration, loaded from environment or a local .env file."""
 
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):
@@ -17,6 +21,10 @@ class Settings(BaseSettings):
 
     github_token: str = ""
     target_repo: str = ""
+    #: Root of one corpus (raw/runs, raw/jobs, raw/logs). A second repo gets its own
+    #: directory so its logs never mix into the counts recorded for the first.
+    #: A relative DATA_DIR resolves from the working directory.
+    data_dir: Path = PROJECT_ROOT / "data"
     aws_region: str = "us-west-2"
     log_level: str = "INFO"
 
