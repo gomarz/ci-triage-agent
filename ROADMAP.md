@@ -4,7 +4,8 @@ Where the project is, what's next, and what's still undecided. Update the
 Status line and the Now section as things move; leave the measured baseline
 alone unless you re-measure.
 
-**Status:** stages 1 and 2 built and measured. Stage 3 not started.
+**Status:** stages 1 and 2 built and measured, across Robot, unittest and
+job-level crash logs. Stage 3 not started.
 
 ---
 
@@ -30,10 +31,11 @@ Reproduce with `python scripts/cluster_preview.py --roots`.
 
 | Metric | Value |
 |---|---|
-| Failures extracted | 65,532 |
-| Coverage vs Robot's own tally | 100% |
-| Distinct cause signatures | 473 |
-| Distinct roots | 264 |
+| Failed jobs by shape | Robot 180 · unittest 53 · crash 17 · unrecognized 1 |
+| Failures extracted | 65,598 (Robot 65,495 · unittest 86 · crash 17) |
+| Coverage vs the runner's own tally | Robot 99.99% (65,495 / 65,503) · unittest 100% (86 / 86) |
+| Distinct cause signatures | 492 |
+| Distinct roots | 267 |
 | Largest root | 57,155 failures / 6,397 tests → one missing artifact |
 | Unclassified | 139 occ (0%), 1 bucket |
 
@@ -41,12 +43,16 @@ Extraction rules, by share of distinct roots:
 
 ```
 failed-reason    9%      exception   23%
-first-line      46%      diff        23%
+first-line      46%      diff        22%
 ```
 
+The earlier baseline (65,532 failures, "100%") counted 37 unittest jobs as
+one Robot failure each. See the gotcha in `CLAUDE.md`. Robot is 8 failures
+short of its own tally; not yet investigated.
+
 `first-line` is the weakest rule and produces the largest share of root
-identities. That number is the honest measure of where deterministic rules
-run out, and the argument for a model call at stage 3 or 4.
+identities — the measured gap deterministic rules can't close (see
+`CLAUDE.md`).
 
 ---
 
@@ -83,21 +89,23 @@ Next in this track:
 
 ## Next up, in order
 
-### 1. unittest / pytest parser
+### Done: failed jobs that aren't Robot runs
 
-34 cached jobs fail with no Robot `FAIL:` blocks — unit test and lint jobs.
-They're currently dropped, so the corpus is smaller than it looks. List them
-with `cluster_preview.py --unparsed`.
+Was "unittest / pytest parser". Sampling the 34 unparsed jobs showed they
+were not one thing, so the work split by shape (`jobs.py`):
 
-Write this one by hand. The Robot parser sits next to it as a reference, but
-deciding what's analogous and what isn't is where the understanding lives.
+- **unittest** — `unittest_extract.py`. 53 jobs, 86 failures, 100% of
+  unittest's own count. 37 of those jobs had been misparsed as Robot (see the
+  `CLAUDE.md` gotcha), so the real count of jobs outside Robot was 71, not 34.
+- **crash** — `crash.py`. 17 jobs that died on an import error, a syntax
+  error on an old interpreter, or a bad Robot flag before any test reported.
+  One job-level record each, from the first traceback.
+- **unrecognized** — 1 job, GitHub's Copilot review bot. Not a test run;
+  counted rather than dropped or forced through a parser.
 
-Design constraint already known: unittest uses the same `FAIL:` marker Robot
-does, and its separator is 70 chars where Robot's is 100. In these logs
-unittest's `FAIL:` is top-level, so disambiguation has to come from
-something other than the marker.
+No pytest logs exist in the corpus, so there is no pytest parser.
 
-### 2. Classification
+### 1. Classification
 
 `FailureCategory` has existed in `models.py` since the scaffold and nothing
 sets it. Rule-based first — the top roots map cleanly:
@@ -110,13 +118,13 @@ sets it. Rule-based first — the top roots map cleanly:
 Classification is what turns a cluster list into something actionable, and
 it's what stage 4 keys its proposal type off.
 
-### 3. Verification target
+### 2. Verification target
 
 Stage 4 can't be built without somewhere to actually run tests.
 `robotframework/robotframework` can't be pushed to and its suite takes 12
 minutes. See Open decisions.
 
-### 4. Agent loop and eval harness
+### 3. Agent loop and eval harness
 
 Fix proposal, then scoring on two axes: **fix rate** (did the suite pass)
 and **cheat rate** (did the patch weaken or delete the assertion). High fix
@@ -155,7 +163,18 @@ for the semantic leap they can't make.
   `roots.ROOT_LIMITS`.
 - `_MEANINGFUL_DESCRIPTORS` is a substring test, so markup containing "does
   not" would leak through as a root. No such string in the current corpus.
-- 34 jobs unparsed pending the unittest parser.
+- Large `assertDictEqual` failures make poor roots. The message is a
+  truncated repr of two big dicts (`{'spe[224 chars]...[28485 chars]']}]} != {...`),
+  the char counts change between runs, and the comparison marker is followed
+  by `{`, so `_trim_comparison` doesn't cut it. 37 occurrences split across
+  6 roots. Rule `exception` reports it with the same confidence as a clean
+  one.
+- A crash root of `SyntaxError: invalid syntax` says nothing about which
+  construct; the frame with the file and line is dropped on purpose.
+- A crash takes the first traceback in the job. A benign traceback printed
+  earlier than the real failure would win.
+- Robot extraction is 8 failures short of Robot's own tally (65,495 of
+  65,503). Not investigated.
 - Cached logs expire. GitHub deletes Actions logs on the repo's retention
   schedule, 90 days by default; `check_log_availability.py` reports what's
   still fetchable before a re-fetch commits to it.
@@ -167,5 +186,4 @@ for the semantic leap they can't make.
 - Keep tuning the normalizer. There is another finding like the guard bug
   every time you look, and the resume claims a four-stage loop of which one
   and a half exist. Thin versions of all four beat deep versions of two.
-- Let Claude Code author the unittest parser. Rubber duck, not author.
 - Commit `data/` (gitignored, ~20MB, re-fetchable from the API).

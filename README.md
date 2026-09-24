@@ -28,11 +28,17 @@ Measured against `robotframework/robotframework`, 251 job logs across 55 runs:
 
 |Metric|Value|
 |-|-|
-|Failures extracted|65,532|
-|Coverage vs Robot's own tally|100%|
-|Distinct cause signatures|473|
-|Distinct root causes|261|
+|Failed jobs by shape|Robot 180, unittest 53, crash 17, unrecognized 1|
+|Failures extracted|65,598|
+|Coverage vs the runner's own tally|Robot 99.99% (65,495 of 65,503), unittest 100% (86 of 86)|
+|Distinct cause signatures|492|
+|Distinct root causes|267|
 |Largest root|57,155 failures across 6,397 tests → one missing artifact|
+
+A failed job is not always a Robot run. Unit-test jobs get their own parser, and
+a job that dies on an import error before any test reports is recorded as one
+job-level failure. A log that fits none of these is counted as unrecognized
+rather than dropped.
 
 That last row is the case for doing this at all. A job reporting 7,100 failed
 tests is unreadable. The same job reported as one missing file is actionable.
