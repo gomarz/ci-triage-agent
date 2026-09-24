@@ -72,8 +72,8 @@ def parse_unittest_tally(text: str) -> RunTally | None:
     A job can run unittest more than once and each run prints blocks, so the
     counts are summed. Robot takes the last summary because its runs nest.
     Only failures and errors are counted: they are the two outcomes that
-    print a block. Skips and expected failures do not, and "passed" here is
-    simply total minus failed.
+    print a block. Skips and expected failures do not, so "passed" here is
+    total minus failed.
     """
     matches = list(_TALLY.finditer(text))
     if not matches:

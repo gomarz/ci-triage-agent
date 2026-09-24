@@ -68,11 +68,10 @@ def test_log_without_blocks_yields_nothing():
 
 
 def test_unittest_output_is_not_a_robot_failure(log):
-    """Regression: the Robot extractor once claimed this log as one failure.
+    """unittest prints the same "FAIL:" header as Robot.
 
-    unittest prints the same "FAIL:" header. With no 100-character rule to
-    split on, the whole log was a single chunk and the first FAIL: swallowed
-    everything after it as its message.
+    With no 100-character rule to split on, the whole log would be a single
+    chunk and the first FAIL: would swallow everything after it as its message.
     """
     assert extract_failures(strip_timestamps(log("unittest_fail.txt"))) == []
 

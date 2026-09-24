@@ -77,10 +77,10 @@ wrong category would send stage 4 down the wrong proposal type.
 
 Report it by roots, not occurrences: one missing artifact is 57,155 of 65,598
 failures. 109 of 266 roots (41%) are classified: 19 infrastructure, 57
-regression, 33 environment. Accuracy against labels is unmeasured. Rules were
-checked by reading every root each one caught, which removed `should be` from
-the mismatch rule (it matched "captured stderr should be empty" around a
-SyntaxError from an old interpreter, and Robot's own status wrapper).
+regression, 33 environment. Accuracy against labels is unmeasured.
+
+`should be` is not a mismatch signal: Robot uses it for "captured stderr
+should be empty" and inside its own status wrapper.
 
 FLAKE is never assigned. It needs the same test failing and passing on one
 commit. All 100 cached runs are failures on attempt 1, and commits with
