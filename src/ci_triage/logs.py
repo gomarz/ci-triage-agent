@@ -42,6 +42,28 @@ class LogsExpired(Exception):
     """Raised when GitHub has already deleted the logs for a job."""
 
 
+def build_client(token: str, *, transport: httpx.BaseTransport | None = None) -> httpx.Client:
+    """HTTP client for the GitHub API.
+
+    follow_redirects=True is load-bearing: the logs endpoint answers 302 with a
+    signed blob URL, and without it every log comes back empty, which looks like
+    a data problem rather than a client one. httpx drops the Authorization header
+    when a redirect leaves the original host, so the token is not sent to the blob
+    store. `transport` lets tests stand in for the network.
+    """
+    return httpx.Client(
+        base_url="https://api.github.com",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        follow_redirects=True,
+        timeout=60.0,
+        transport=transport,
+    )
+
+
 def fetch_jobs(client: httpx.Client, repo: str, run_id: int) -> list[Job]:
     """Fetch every job for a run, following pagination."""
     jobs: list[Job] = []
