@@ -1,0 +1,71 @@
+﻿2026-08-31T08:53:14.6094673Z Current runner version: '2.336.0'
+2026-08-31T08:53:39.8120549Z 
+2026-08-31T08:53:39.8149269Z Successfully installed elementpath-5.1.4 xmlschema-4.3.2
+2026-08-31T08:53:39.9573319Z Python 3.13.15 on Windows
+2026-08-31T08:53:39.9573621Z -------------------------
+2026-08-31T08:53:39.9573783Z 
+2026-08-31T08:53:39.9573860Z Running command:
+2026-08-31T08:53:39.9576321Z C:\hostedtoolcache\windows\Python\3.13.15\x64\python.exe D:\a\robotframework\robotframework\src\robot\run.py --doc Robot Framework acceptance tests --metadata interpreter:Python 3.13.15 on Windows --variable-file D:\a\robotframework\robotframework\atest\interpreter.py;C:\hostedtoolcache\windows\Python\3.13.15\x64\python.exe;Python;3.13.15 --pythonpath D:\a\robotframework\robotframework\atest\resources --output-dir D:\a\robotframework\robotframework\atest\results\Python-3.13.15-Windows --splitlog --console dotted --console-width 100 --suite-stat-level 3 --log NONE --report NONE --exclude require-py3.14 --exclude no-windows --exclude require-linux --exclude no-ci atest/robot
+2026-08-31T08:53:39.9578727Z 
+2026-08-31T08:53:40.0445571Z Traceback (most recent call last):
+2026-08-31T08:53:40.0459835Z   File "D:\a\robotframework\robotframework\src\robot\run.py", line 41, in <module>
+2026-08-31T08:53:40.0460601Z     from robot.conf import RobotSettings
+2026-08-31T08:53:40.0461336Z   File "D:\a\robotframework\robotframework\src\robot\__init__.py", line 43, in <module>
+2026-08-31T08:53:40.0462175Z     from robot.rebot import rebot as rebot, rebot_cli as rebot_cli
+2026-08-31T08:53:40.0462990Z   File "D:\a\robotframework\robotframework\src\robot\rebot.py", line 40, in <module>
+2026-08-31T08:53:40.0464073Z     from robot.conf import RebotSettings
+2026-08-31T08:53:40.0464786Z   File "D:\a\robotframework\robotframework\src\robot\conf\__init__.py", line 27, in <module>
+2026-08-31T08:53:40.0465480Z     from .languages import (
+2026-08-31T08:53:40.0465838Z     ...<4 lines>...
+2026-08-31T08:53:40.0466140Z     )
+2026-08-31T08:53:40.0466919Z   File "D:\a\robotframework\robotframework\src\robot\conf\languages.py", line 22, in <module>
+2026-08-31T08:53:40.0467950Z     from robot.utils import classproperty, Importer, is_list_like, normalize
+2026-08-31T08:53:40.0469006Z   File "D:\a\robotframework\robotframework\src\robot\utils\__init__.py", line 38, in <module>
+2026-08-31T08:53:40.0470271Z     from .application import Application as Application
+2026-08-31T08:53:40.0471226Z   File "D:\a\robotframework\robotframework\src\robot\utils\application.py", line 22, in <module>
+2026-08-31T08:53:40.0472121Z     from .argumentparser import ArgumentParser
+2026-08-31T08:53:40.0473054Z   File "D:\a\robotframework\robotframework\src\robot\utils\argumentparser.py", line 25, in <module>
+2026-08-31T08:53:40.0474049Z     from confargs import ArgConfig, ConfigurationProcessor, option
+2026-08-31T08:53:40.0474669Z ModuleNotFoundError: No module named 'confargs'
+2026-08-31T08:53:40.1149953Z Traceback (most recent call last):
+2026-08-31T08:53:40.1156936Z   File "D:\a\robotframework\robotframework\src\robot\rebot.py", line 40, in <module>
+2026-08-31T08:53:40.1157663Z     from robot.conf import RebotSettings
+2026-08-31T08:53:40.1158252Z   File "D:\a\robotframework\robotframework\src\robot\__init__.py", line 43, in <module>
+2026-08-31T08:53:40.1158871Z     from robot.rebot import rebot as rebot, rebot_cli as rebot_cli
+2026-08-31T08:53:40.1159468Z   File "D:\a\robotframework\robotframework\src\robot\rebot.py", line 40, in <module>
+2026-08-31T08:53:40.1159994Z     from robot.conf import RebotSettings
+2026-08-31T08:53:40.1160550Z   File "D:\a\robotframework\robotframework\src\robot\conf\__init__.py", line 27, in <module>
+2026-08-31T08:53:40.1161097Z     from .languages import (
+2026-08-31T08:53:40.1161351Z     ...<4 lines>...
+2026-08-31T08:53:40.1161556Z     )
+2026-08-31T08:53:40.1161994Z   File "D:\a\robotframework\robotframework\src\robot\conf\languages.py", line 22, in <module>
+2026-08-31T08:53:40.1162988Z     from robot.utils import classproperty, Importer, is_list_like, normalize
+2026-08-31T08:53:40.1163692Z   File "D:\a\robotframework\robotframework\src\robot\utils\__init__.py", line 38, in <module>
+2026-08-31T08:53:40.1164291Z     from .application import Application as Application
+2026-08-31T08:53:40.1165172Z   File "D:\a\robotframework\robotframework\src\robot\utils\application.py", line 22, in <module>
+2026-08-31T08:53:40.1165755Z     from .argumentparser import ArgumentParser
+2026-08-31T08:53:40.1166347Z   File "D:\a\robotframework\robotframework\src\robot\utils\argumentparser.py", line 25, in <module>
+2026-08-31T08:53:40.1167010Z     from confargs import ArgConfig, ConfigurationProcessor, option
+2026-08-31T08:53:40.1167478Z ModuleNotFoundError: No module named 'confargs'
+2026-08-31T08:53:40.1384840Z Traceback (most recent call last):
+2026-08-31T08:53:40.1452839Z   File "D:\a\robotframework\robotframework\atest\run.py", line 169, in <module>
+2026-08-31T08:53:40.1453610Z     rc = atests(
+2026-08-31T08:53:40.1453992Z         interpreter,
+2026-08-31T08:53:40.1454326Z     ...<2 lines>...
+2026-08-31T08:53:40.1454675Z         options.schema_validation,
+2026-08-31T08:53:40.1455008Z     )
+2026-08-31T08:53:40.1455732Z   File "D:\a\robotframework\robotframework\atest\run.py", line 74, in atests
+2026-08-31T08:53:40.1456485Z     _rebot(rc, output_dir, interpreter)
+2026-08-31T08:53:40.1456889Z     ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-08-31T08:53:40.1457892Z   File "D:\a\robotframework\robotframework\atest\run.py", line 142, in _rebot
+2026-08-31T08:53:40.1458545Z     shutil.copy(output, latest)
+2026-08-31T08:53:40.1458895Z     ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+2026-08-31T08:53:40.1459511Z   File "C:\hostedtoolcache\windows\Python\3.13.15\x64\Lib\shutil.py", line 428, in copy
+2026-08-31T08:53:40.1460580Z     copyfile(src, dst, follow_symlinks=follow_symlinks)
+2026-08-31T08:53:40.1461064Z     ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-08-31T08:53:40.1461774Z   File "C:\hostedtoolcache\windows\Python\3.13.15\x64\Lib\shutil.py", line 260, in copyfile
+2026-08-31T08:53:40.1462739Z     with open(src, 'rb') as fsrc:
+2026-08-31T08:53:40.1463078Z          ~~~~^^^^^^^^^^^
+2026-08-31T08:53:40.1463966Z FileNotFoundError: [Errno 2] No such file or directory: 'D:\\a\\robotframework\\robotframework\\atest\\results\\Python-3.13.15-Windows\\output.xml'
+2026-08-31T08:53:40.2481565Z ##[error]Process completed with exit code 1.
+2026-08-31T08:53:40.4854669Z Post job cleanup.

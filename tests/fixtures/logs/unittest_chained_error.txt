@@ -1,0 +1,51 @@
+﻿2026-09-01T08:53:39.3989476Z Current runner version: '2.336.0'
+2026-09-01T08:53:55.0767413Z test_rebot_specific_options (test_confargsparser.TestConfargsParser.test_rebot_specific_options) ... ok
+2026-09-01T08:53:55.3120588Z test_short_options_stay_case_sensitive (test_confargsparser.TestConfargsParser.test_short_options_stay_case_sensitive) ... ok
+2026-09-01T08:53:55.4278977Z test_show_completion_exits_cleanly (test_confargsparser.TestConfargsParser.test_show_completion_exits_cleanly) ... ERROR
+2026-09-01T08:53:57.2778752Z test_replace_scalar (test_variables.TestVariables.test_replace_scalar) ... ok
+2026-09-01T08:53:57.2782464Z test_sequence_subscript (test_variables.TestVariables.test_sequence_subscript) ... ok
+2026-09-01T08:53:57.2783645Z test_set (test_variables.TestVariables.test_set) ... ok
+2026-09-01T08:53:57.2784829Z test_set_invalid (test_variables.TestVariables.test_set_invalid) ... ok
+2026-09-01T08:53:57.2787413Z test_set_list (test_variables.TestVariables.test_set_list) ... ok
+2026-09-01T08:53:57.2790492Z test_set_scalar (test_variables.TestVariables.test_set_scalar) ... ok
+2026-09-01T08:53:57.2794181Z test_space_is_not_ignored_after_newline_in_extend_variable_syntax (test_variables.TestVariables.test_space_is_not_ignored_after_newline_in_extend_variable_syntax) ... ok
+2026-09-01T08:53:57.2795590Z test_variable_as_object (test_variables.TestVariables.test_variable_as_object) ... ok
+2026-09-01T08:53:57.2796490Z test_variables_in_value (test_variables.TestVariables.test_variables_in_value) ... ok
+2026-09-01T08:53:57.2797044Z 
+2026-09-01T08:53:57.2797261Z ======================================================================
+2026-09-01T08:53:57.2797892Z ERROR: test_show_completion_exits_cleanly (test_confargsparser.TestConfargsParser.test_show_completion_exits_cleanly)
+2026-09-01T08:53:57.2798657Z ----------------------------------------------------------------------
+2026-09-01T08:53:57.2799281Z Traceback (most recent call last):
+2026-09-01T08:53:57.2807216Z   File "/home/runner/work/robotframework/robotframework/utest/../src/robot/utils/confargsparser.py", line 96, in parse_args
+2026-09-01T08:53:57.2807870Z     ).process()
+2026-09-01T08:53:57.2808116Z       ~~~~~~~^^
+2026-09-01T08:53:57.2808963Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/confargs/processor.py", line 120, in process
+2026-09-01T08:53:57.2809614Z     cli_result = parse_cli(argv, self.table, self.flags, self.lists)
+2026-09-01T08:53:57.2810494Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/confargs/cli.py", line 116, in parse_cli
+2026-09-01T08:53:57.2811115Z     index = _handle_long(token, args, index, result, table, flags, list_opts)
+2026-09-01T08:53:57.2811771Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/confargs/cli.py", line 150, in _handle_long
+2026-09-01T08:53:57.2812364Z     raise CliUsageError(f"unknown option {name!r}")
+2026-09-01T08:53:57.2812796Z confargs.exceptions.CliUsageError: unknown option '--show-completion'
+2026-09-01T08:53:57.2813090Z 
+2026-09-01T08:53:57.2813282Z During handling of the above exception, another exception occurred:
+2026-09-01T08:53:57.2813546Z 
+2026-09-01T08:53:57.2813793Z Traceback (most recent call last):
+2026-09-01T08:53:57.2814453Z   File "/home/runner/work/robotframework/robotframework/utest/utils/test_confargsparser.py", line 138, in test_show_completion_exits_cleanly
+2026-09-01T08:53:57.2815097Z     error = assert_raises(
+2026-09-01T08:53:57.2815477Z         Information, parser().parse_args, ["--show-completion", "powershell"]
+2026-09-01T08:53:57.2815855Z     )
+2026-09-01T08:53:57.2816348Z   File "/home/runner/work/robotframework/robotframework/utest/../src/robot/utils/asserts.py", line 152, in assert_raises
+2026-09-01T08:53:57.2816892Z     callable_obj(*args, **kwargs)
+2026-09-01T08:53:57.2817144Z     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+2026-09-01T08:53:57.2817686Z   File "/home/runner/work/robotframework/robotframework/utest/../src/robot/utils/confargsparser.py", line 106, in parse_args
+2026-09-01T08:53:57.2818254Z     raise DataError(str(err))
+2026-09-01T08:53:57.2818701Z robot.errors.DataError: unknown option '--show-completion'
+2026-09-01T08:53:57.2818950Z 
+2026-09-01T08:53:57.2819120Z ----------------------------------------------------------------------
+2026-09-01T08:53:57.2819469Z Ran 2457 tests in 11.344s
+2026-09-01T08:53:57.2819622Z 
+2026-09-01T08:53:57.2819713Z FAILED (errors=1)
+2026-09-01T08:53:57.4264108Z ##[error]Process completed with exit code 1.
+2026-09-01T08:53:57.4414870Z Post job cleanup.
+2026-09-01T08:53:57.5323393Z [command]/usr/bin/git version
+2026-09-01T08:53:57.5362173Z git version 2.55.0
