@@ -8,7 +8,7 @@ Rules read the root sentence, tried in order, first match wins, and every
 result names the rule that produced it, as root extraction does. They fire
 only on a strong indicator. A failure no rule is sure about stays UNTRIAGED
 instead of getting a plausible guess: a wrong category sends stage 4 down the
-wrong proposal type, while UNTRIAGED is an honest hand-off to the model.
+wrong proposal type, while UNTRIAGED leaves the failure for the model.
 
 FLAKE is never assigned here. A flake is a test that passes and fails on the
 same commit, which takes a passing run to compare against, and the cached

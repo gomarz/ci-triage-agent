@@ -28,7 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from ci_triage.classify import FLAKE_LIMITS, classify
+from ci_triage.classify import classify
 from ci_triage.jobs import JobShape, parse_job
 from ci_triage.logs import diagnostic_body, read_log
 from ci_triage.models import FailureCategory
@@ -243,7 +243,7 @@ def main() -> int:
             if result.category == FailureCategory.UNTRIAGED:
                 untriaged.append((len(members), members[0].root or "(no root extracted)"))
 
-        # Roots are the honest denominator. One collapsed suite is most of the
+        # Roots are the denominator to read. One collapsed suite is most of the
         # occurrences, so an occurrence share mostly reports that one root.
         print("\ncategory        roots            occurrences\n")
         for category, (occ, n_roots) in sorted(by_category.items(), key=lambda kv: -kv[1][1]):
@@ -257,7 +257,7 @@ def main() -> int:
         print(f"\nleft for a model, largest first (top {args.top}):\n")
         for occ, root in sorted(untriaged, reverse=True)[: args.top]:
             print(f"  {occ:>6}  {root[:100]}")
-        print(f"\n  flake: not assigned. {FLAKE_LIMITS.splitlines()[0]} ...")
+        print("\n  flake: not assigned (needs passing runs; see classify.FLAKE_LIMITS)")
         return 0
 
     if args.cascades:

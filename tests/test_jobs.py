@@ -50,7 +50,7 @@ Post job cleanup.
     [
         ("unittest_three_errors.txt", JobShape.UNITTEST),
         ("unittest_chained_error.txt", JobShape.UNITTEST),
-        # Previously misfiled as Robot: see test_unittest_extract.
+        # A FAIL: header with no Robot rule. See test_unittest_extract.
         ("unittest_fail.txt", JobShape.UNITTEST),
         ("crash_import_error.txt", JobShape.CRASH),
         ("crash_cascade.txt", JobShape.CRASH),

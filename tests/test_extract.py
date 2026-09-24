@@ -154,8 +154,7 @@ def test_root_merges_across_platforms():
 def test_every_setup_teardown_wrapper_is_peeled(wrapper):
     """Robot capitalises only the first word, so these are all different strings.
 
-    "Parent suite setup failed:" was the root of 959 failures, with the
-    real cause on the line beneath it.
+    The real cause is on the line beneath the wrapper.
     """
     missing = "Source file '/tmp/robotatest/Python-3.10.21-Linux/output/output.xml' does not exist."
     message = f"{wrapper}\n{missing}"
