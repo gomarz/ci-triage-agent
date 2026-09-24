@@ -25,10 +25,17 @@ data/raw/jobs/{run_id}.json         job manifest
 data/raw/logs/{run_id}/{job_id}.txt raw log text, timestamps intact
 ```
 
-251 job logs across 55 runs. 65,532 failures extracted at 100% coverage
-against Robot's own tally. 473 cause signatures, 261 roots. The largest
+251 job logs across 55 runs, every one a failed job. By shape (`jobs.py`):
+180 Robot, 53 unittest, 17 crash, 1 unrecognized. 65,598 failures
+extracted: Robot 65,495 of the 65,503 it reported (99.99%), unittest 86 of
+86, plus 17 job-level crashes. 492 cause signatures, 267 roots. The largest
 root resolves 57,155 failures across 6,397 tests to one missing artifact
 file.
+
+Parsing is per shape. Robot goes first, then unittest, then crash; whatever
+matches none is `unrecognized` and stays in the counts. A crash is one
+record per job (`scope="job"`, `test_id="<job>"`) taken from the first
+traceback, since later ones are consequences.
 
 ## Commands
 
@@ -42,6 +49,7 @@ python scripts/fetch_logs.py                 # resumable; skips cached
 python scripts/peek_failure.py --groups      # what the runner actually ran
 python scripts/cluster_preview.py --roots    # root clusters + rule breakdown
 python scripts/cluster_preview.py --root-sig SIG   # inspect one root
+python scripts/cluster_preview.py --unparsed # failed jobs no parser recognized
 ```
 
 `GITHUB_TOKEN` with `actions:read` is required for anything that fetches.
@@ -77,6 +85,22 @@ the final group, so "last group" is teardown, never the failure. Anchor on
 
 **Robot's separator is 100 dashes; unittest's is 70.** Splitting on `-{70,}`
 shreds nested unittest tracebacks. `extract._RULE` requires 90+.
+
+**unittest prints `FAIL:` too.** With no Robot rule in the log,
+`extract_failures` used to see one chunk, and the first unittest `FAIL:` swallowed
+the rest of the log (up to 146 KB) as a single "Robot failure". 37 jobs
+were counted that way, and the extras hid an 8-failure shortfall inside a
+rounded "100%". `extract_failures` now returns nothing without a 90+
+rule.
+
+**Verbose unittest prints every failure twice.** Once inline while it runs
+(`name (id) ... ERROR`), once as a block between two 70-character rules. Only
+the block has the traceback. A block ends at the next rule, not the next
+`Traceback`: chained exceptions put two inside one block.
+
+**Compare coverage like for like.** Extracted failures from jobs that printed
+a tally against the tallies, nothing else. Comparing all extracted failures to
+the tallied subset is what let the 37 extras through.
 
 **The unit of aggregation is the job, not the run.** A matrix run has many
 jobs, each with its own tally. Summing jobs while comparing against one
