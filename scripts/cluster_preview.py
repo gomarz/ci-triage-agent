@@ -29,12 +29,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from ci_triage.classify import classify
+from ci_triage.config import load_settings
 from ci_triage.jobs import JobShape, parse_job
 from ci_triage.logs import diagnostic_body, read_log
 from ci_triage.models import FailureCategory
 
-ROOT = Path(__file__).resolve().parent.parent
-LOGS = ROOT / "data" / "raw" / "logs"
+LOGS = load_settings().data_dir / "raw" / "logs"
 
 RULE = "=" * 78
 

@@ -9,7 +9,7 @@ Layout written:
     data/raw/logs/{run_id}/{job_id}.txt   raw log text, timestamps intact
 
 Usage:
-    python scripts/fetch_logs.py [--limit N] [--all-jobs]
+    python scripts/fetch_logs.py [--limit N] [--all-jobs] [--all-runs]
 """
 
 from __future__ import annotations
@@ -25,13 +25,14 @@ import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from ci_triage.config import load_settings  # noqa: E402
 from ci_triage.logs import LogsExpired, build_client, fetch_job_log, fetch_jobs  # noqa: E402
 from ci_triage.models import Run  # noqa: E402
 
-ROOT = Path(__file__).resolve().parent.parent
-RUNS = ROOT / "data" / "raw" / "runs"
-JOBS = ROOT / "data" / "raw" / "jobs"
-LOGS = ROOT / "data" / "raw" / "logs"
+RAW = load_settings().data_dir / "raw"
+RUNS = RAW / "runs"
+JOBS = RAW / "jobs"
+LOGS = RAW / "logs"
 
 
 def load_runs() -> list[Run]:
@@ -54,6 +55,12 @@ def main() -> int:
         action="store_true",
         help="Fetch logs for every job, not just the failing ones.",
     )
+    parser.add_argument(
+        "--all-runs",
+        action="store_true",
+        help="Include runs that did not fail. Their jobs are fetched whole: there are no "
+        "failing jobs to filter to, and the passing test lines are the point.",
+    )
     args = parser.parse_args()
 
     token = os.environ.get("GITHUB_TOKEN")
@@ -61,10 +68,10 @@ def main() -> int:
         print("GITHUB_TOKEN not set", file=sys.stderr)
         return 1
 
-    runs = [r for r in load_runs() if r.triageable]
+    runs = [r for r in load_runs() if args.all_runs or r.triageable]
     if args.limit:
         runs = runs[: args.limit]
-    print(f"{len(runs)} triageable runs to process\n")
+    print(f"{len(runs)} runs to process\n")
 
     fetched = skipped = expired = errored = 0
     total_bytes = 0
@@ -87,11 +94,12 @@ def main() -> int:
                 manifest.parent.mkdir(parents=True, exist_ok=True)
                 manifest.write_text(json.dumps(jobs_data, indent=2), encoding="utf-8")
 
+            everything = args.all_jobs or not run.triageable
             wanted = [
-                j for j in jobs_data if args.all_jobs or j["conclusion"] in ("failure", "timed_out")
+                j for j in jobs_data if everything or j["conclusion"] in ("failure", "timed_out")
             ]
             if not wanted:
-                print(f"[{i}/{len(runs)}] {run.id}  no failing jobs")
+                print(f"[{i}/{len(runs)}] {run.id}  no jobs to fetch")
                 continue
 
             for job in wanted:

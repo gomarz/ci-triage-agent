@@ -1,4 +1,6 @@
-from ci_triage.config import Settings
+from pathlib import Path
+
+from ci_triage.config import PROJECT_ROOT, Settings
 
 
 def test_repo_parts_split_owner_and_name():
@@ -17,3 +19,13 @@ def test_defaults():
     settings = Settings()
     assert settings.aws_region
     assert settings.log_level in {"DEBUG", "INFO", "WARNING", "ERROR"}
+
+
+def test_data_dir_defaults_to_project_data(monkeypatch):
+    monkeypatch.delenv("DATA_DIR", raising=False)
+    assert Settings(_env_file=None).data_dir == PROJECT_ROOT / "data"
+
+
+def test_data_dir_comes_from_environment(monkeypatch):
+    monkeypatch.setenv("DATA_DIR", "data/testbed")
+    assert Settings(_env_file=None).data_dir == Path("data/testbed")
