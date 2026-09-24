@@ -3,8 +3,8 @@
 An agentic service that ingests CI failures from GitHub Actions, clusters them
 by root cause, and proposes verified fixes.
 
-**Status:** Ingestion and clustering are built and measured against a real
-corpus. Classification and the agent loop are not. See [Roadmap](#roadmap).
+**Status:** Ingestion, clustering and rule-based classification are built and
+measured against a real corpus. The agent loop is not. See [Roadmap](#roadmap).
 
 ## Why
 
@@ -28,11 +28,17 @@ Measured against `robotframework/robotframework`, 251 job logs across 55 runs:
 
 |Metric|Value|
 |-|-|
-|Failures extracted|65,532|
-|Coverage vs Robot's own tally|100%|
-|Distinct cause signatures|473|
-|Distinct root causes|261|
+|Failed jobs by shape|Robot 180, unittest 53, crash 17, unrecognized 1|
+|Failures extracted|65,598|
+|Coverage vs the runner's own tally|Robot 99.99% (65,495 of 65,503), unittest 100% (86 of 86)|
+|Distinct cause signatures|492|
+|Distinct root causes|266|
 |Largest root|57,155 failures across 6,397 tests → one missing artifact|
+
+A failed job is not always a Robot run. Unit-test jobs get their own parser, and
+a job that dies on an import error before any test reports is recorded as one
+job-level failure. A log that fits none of these is counted as unrecognized
+rather than dropped.
 
 That last row is the case for doing this at all. A job reporting 7,100 failed
 tests is unreadable. The same job reported as one missing file is actionable.
@@ -52,6 +58,23 @@ layers and keeps the innermost diagnostic sentence.
 
 It is deterministic rather than embedding-based, so which failures merge is
 predictable and reviewable rather than a tuned similarity threshold.
+
+### Classification
+
+Each root gets a category: regression, environment or infrastructure. Rules read
+the extracted root sentence, first match wins, and each result names its rule.
+They fire only on a strong indicator (a missing module, a missing build artifact,
+an actual-against-expected mismatch). Anything ambiguous stays untriaged rather
+than getting a plausible guess, because a wrong category would send the fix
+proposal down the wrong path.
+
+109 of 266 roots (41%) are classified. The share of failures looks higher (98%)
+but is mostly one root: a single missing artifact behind 57,155 failures.
+Category accuracy has not been measured against labels, which is what the eval
+harness is for.
+
+Flake is not assigned. It needs the same test failing in one run and passing in
+another, and every run in the corpus is a failure.
 
 ### Where it runs out
 
@@ -76,7 +99,7 @@ GitHub Actions run fails
         ↓
   cluster: root / cause / case signatures              ← built
         ↓
-  classify: regression / flake / environment           ← next
+  classify: regression / environment / infrastructure  ← built (flake: needs passing runs)
         ↓
   agent loop: reproduce → patch → run tests → verify   (budgeted, sandboxed)
         ↓
@@ -118,7 +141,7 @@ A high fix rate with a high cheat rate is a failure, not a success.
 * \[x] Project scaffolding, lint, tests, CI
 * \[x] GitHub Actions ingestion — fetch runs, download logs, persist
 * \[x] Failure extraction, normalization, and root-cause clustering
-* \[ ] Failure classification
+* \[x] Rule-based failure classification (flake detection needs passing runs)
 * \[ ] Eval harness and labeled failure corpus
 * \[ ] Agent loop with tool calls and step/cost budget
 * \[ ] Sandboxed test execution on Fargate

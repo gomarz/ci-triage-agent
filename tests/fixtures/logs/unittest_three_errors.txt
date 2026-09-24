@@ -1,0 +1,56 @@
+﻿2026-06-30T18:01:27.3932131Z Current runner version: '2.335.1'
+2026-06-30T18:01:46.3431015Z test_set_list (test_variables.TestVariables.test_set_list) ... ok
+2026-06-30T18:01:46.3434707Z test_set_scalar (test_variables.TestVariables.test_set_scalar) ... ok
+2026-06-30T18:01:46.3439652Z test_space_is_not_ignored_after_newline_in_extend_variable_syntax (test_variables.TestVariables.test_space_is_not_ignored_after_newline_in_extend_variable_syntax) ... ok
+2026-06-30T18:01:46.3441062Z test_variable_as_object (test_variables.TestVariables.test_variable_as_object) ... ok
+2026-06-30T18:01:46.3442354Z test_variables_in_value (test_variables.TestVariables.test_variables_in_value) ... ok
+2026-06-30T18:01:46.3443148Z 
+2026-06-30T18:01:46.3443361Z ======================================================================
+2026-06-30T18:01:46.3444119Z ERROR: test_linkify_urls (test_markdown.TestLinkifyUrls.test_linkify_urls)
+2026-06-30T18:01:46.3444801Z ----------------------------------------------------------------------
+2026-06-30T18:01:46.3445183Z Traceback (most recent call last):
+2026-06-30T18:01:46.3451116Z   File "/home/runner/work/robotframework/robotframework/utest/utils/test_markdown.py", line 43, in test_linkify_urls
+2026-06-30T18:01:46.3451784Z     assert_markdown(text, expected)
+2026-06-30T18:01:46.3452076Z     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+2026-06-30T18:01:46.3452998Z   File "/home/runner/work/robotframework/robotframework/utest/utils/test_markdown.py", line 8, in assert_markdown
+2026-06-30T18:01:46.3453683Z     actual = Markdown(extensions=extensions, **config).convert(text)
+2026-06-30T18:01:46.3454092Z              ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-06-30T18:01:46.3454707Z   File "/home/runner/work/robotframework/robotframework/utest/../src/robot/utils/markdown.py", line 27, in Markdown
+2026-06-30T18:01:46.3455467Z     raise DataError("Markdown format requires 'markdown' module to be installed.")
+2026-06-30T18:01:46.3456063Z robot.errors.DataError: Markdown format requires 'markdown' module to be installed.
+2026-06-30T18:01:46.3456426Z 
+2026-06-30T18:01:46.3456579Z ======================================================================
+2026-06-30T18:01:46.3456990Z ERROR: test_no_urls (test_markdown.TestLinkifyUrls.test_no_urls)
+2026-06-30T18:01:46.3457428Z ----------------------------------------------------------------------
+2026-06-30T18:01:46.3457794Z Traceback (most recent call last):
+2026-06-30T18:01:46.3458374Z   File "/home/runner/work/robotframework/robotframework/utest/utils/test_markdown.py", line 23, in test_no_urls
+2026-06-30T18:01:46.3458963Z     assert_markdown(text)
+2026-06-30T18:01:46.3459211Z     ~~~~~~~~~~~~~~~^^^^^^
+2026-06-30T18:01:46.3459757Z   File "/home/runner/work/robotframework/robotframework/utest/utils/test_markdown.py", line 8, in assert_markdown
+2026-06-30T18:01:46.3460420Z     actual = Markdown(extensions=extensions, **config).convert(text)
+2026-06-30T18:01:46.3468816Z              ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-06-30T18:01:46.3469503Z   File "/home/runner/work/robotframework/robotframework/utest/../src/robot/utils/markdown.py", line 27, in Markdown
+2026-06-30T18:01:46.3470498Z     raise DataError("Markdown format requires 'markdown' module to be installed.")
+2026-06-30T18:01:46.3471096Z robot.errors.DataError: Markdown format requires 'markdown' module to be installed.
+2026-06-30T18:01:46.3471439Z 
+2026-06-30T18:01:46.3471576Z ======================================================================
+2026-06-30T18:01:46.3472131Z ERROR: test_url_that_should_not_be_touched (test_markdown.TestLinkifyUrls.test_url_that_should_not_be_touched)
+2026-06-30T18:01:46.3473034Z ----------------------------------------------------------------------
+2026-06-30T18:01:46.3473406Z Traceback (most recent call last):
+2026-06-30T18:01:46.3474084Z   File "/home/runner/work/robotframework/robotframework/utest/utils/test_markdown.py", line 32, in test_url_that_should_not_be_touched
+2026-06-30T18:01:46.3474713Z     assert_markdown(text)
+2026-06-30T18:01:46.3474957Z     ~~~~~~~~~~~~~~~^^^^^^
+2026-06-30T18:01:46.3475501Z   File "/home/runner/work/robotframework/robotframework/utest/utils/test_markdown.py", line 8, in assert_markdown
+2026-06-30T18:01:46.3476142Z     actual = Markdown(extensions=extensions, **config).convert(text)
+2026-06-30T18:01:46.3476536Z              ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-06-30T18:01:46.3477149Z   File "/home/runner/work/robotframework/robotframework/utest/../src/robot/utils/markdown.py", line 27, in Markdown
+2026-06-30T18:01:46.3477877Z     raise DataError("Markdown format requires 'markdown' module to be installed.")
+2026-06-30T18:01:46.3478589Z robot.errors.DataError: Markdown format requires 'markdown' module to be installed.
+2026-06-30T18:01:46.3478937Z 
+2026-06-30T18:01:46.3479090Z ----------------------------------------------------------------------
+2026-06-30T18:01:46.3479445Z Ran 2389 tests in 9.018s
+2026-06-30T18:01:46.3479604Z 
+2026-06-30T18:01:46.3479697Z FAILED (errors=3)
+2026-06-30T18:01:46.4480653Z ##[error]Process completed with exit code 3.
+2026-06-30T18:01:46.4626631Z Post job cleanup.
+2026-06-30T18:01:46.5485212Z [command]/usr/bin/git version

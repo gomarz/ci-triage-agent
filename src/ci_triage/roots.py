@@ -59,7 +59,11 @@ _WRAPPERS: list[re.Pattern[str]] = [
         re.MULTILINE,
     ),
     re.compile(r"^Error message:[ \t]*$", re.MULTILINE),
-    re.compile(r"^(?:Parent suite |Suite )?(?:Setup|Teardown) failed:[ \t]*$", re.MULTILINE),
+    # Robot capitalises only the first word: "Setup failed:" but
+    # "Parent suite setup failed:" and "Suite teardown failed:".
+    re.compile(
+        r"^(?:(?:Parent suite|Suite) )?(?:[Ss]etup|[Tt]eardown) failed:[ \t]*$", re.MULTILINE
+    ),
     re.compile(r"^Several failures occurred:[ \t]*$", re.MULTILINE),
     re.compile(r"^\d+\)[ \t]+", re.MULTILINE),
 ]

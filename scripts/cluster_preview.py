@@ -9,25 +9,29 @@ Two axes, because they answer different questions:
   recurrence across runs, which causes keep coming back? A cause seen in
              one run is noise; one seen in nine is the thing to fix first.
 
-Coverage is reported against Robot's own tally, so truncation shows up as a
-number instead of looking like clean data.
+Coverage is reported against each runner's own tally (Robot's, unittest's),
+so truncation shows up as a number instead of looking like clean data. It is
+compared like for like: only jobs that printed a tally count on either side.
 
 Usage:
     python scripts/cluster_preview.py [--top 15] [--cascades] [--sig SIG]
-                                      [--unparsed]
+                                      [--roots] [--root-sig SIG] [--classify]
+                                      [--compression] [--unparsed]
 """
 
 from __future__ import annotations
 
 import argparse
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from ci_triage.extract import extract_failures, parse_tally
-from ci_triage.logs import diagnostic_body, has_error_marker, read_log
+from ci_triage.classify import classify
+from ci_triage.jobs import JobShape, parse_job
+from ci_triage.logs import diagnostic_body, read_log
+from ci_triage.models import FailureCategory
 
 ROOT = Path(__file__).resolve().parent.parent
 LOGS = ROOT / "data" / "raw" / "logs"
@@ -48,9 +52,14 @@ def main() -> int:
         help="Per-job failures -> causes -> roots.",
     )
     parser.add_argument(
+        "--classify",
+        action="store_true",
+        help="Category per root cluster, by rule, plus what is left untriaged.",
+    )
+    parser.add_argument(
         "--unparsed",
         action="store_true",
-        help="List logs that failed but produced no Robot FAIL: blocks.",
+        help="List failed jobs that no parser recognized.",
     )
     args = parser.parse_args()
 
@@ -65,66 +74,69 @@ def main() -> int:
     clusters: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(list))
     roots: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(list))
     per_job: dict[tuple[str, str], list] = {}
+    shapes: dict[tuple[str, str], JobShape] = {}
     tallies: dict[tuple[str, str], object] = {}
-    non_robot: list[tuple[str, str, int]] = []
-    clean = 0
+    unrecognized: list[tuple[str, str, int]] = []
 
     for path in log_files:
         run_id, job_id = path.parent.name, path.stem
         key = (run_id, job_id)
         text = read_log(path)
 
-        if not has_error_marker(text):
-            clean += 1
+        parsed = parse_job(text)
+        shapes[key] = parsed.shape
+
+        if parsed.shape is JobShape.CLEAN:
             continue
 
-        body = diagnostic_body(text)
-        failures = extract_failures(body)
-
-        tally = parse_tally(body)
-        if tally:
-            tallies[key] = tally
-
-        if not failures:
-            # Not a Robot acceptance job: unit tests, lint, or a setup failure.
-            # These need their own parser, and counting them here keeps that
-            # gap visible instead of silently shrinking the corpus.
-            non_robot.append((run_id, path.stem, len(body.splitlines())))
+        if parsed.shape is JobShape.UNRECOGNIZED:
+            # Counted rather than dropped, so a log that fits no parser shows
+            # up here instead of quietly shrinking the corpus.
+            unrecognized.append((run_id, job_id, len(diagnostic_body(text).splitlines())))
             continue
 
-        per_job[key] = failures
-        for failure in failures:
+        per_job[key] = parsed.failures
+        if parsed.tally:
+            tallies[key] = parsed.tally
+        for failure in parsed.failures:
             clusters[failure.cause_sig][key].append(failure)
             roots[failure.root_sig][key].append(failure)
 
     total = sum(len(f) for f in per_job.values())
-    # Only compare against jobs we actually extracted from, or jobs with a
-    # tally but no parseable blocks drag the ratio down for the wrong reason.
-    reported = sum(t.failed for k, t in tallies.items() if k in per_job)
     runs = {run_id for run_id, _ in per_job}
+    shape_counts = Counter(shapes.values())
 
     print(RULE)
-    print(f"logs: {len(log_files)}   no error marker: {clean}")
+    print(f"logs: {len(log_files)}   no error marker: {shape_counts[JobShape.CLEAN]}")
     print(
-        f"jobs with robot failures: {len(per_job)} across {len(runs)} runs"
-        f"   non-robot jobs: {len(non_robot)}"
+        "jobs by shape:   "
+        + "   ".join(
+            f"{shape.value} {shape_counts[shape]}" for shape in JobShape if shape != JobShape.CLEAN
+        )
     )
     print(
-        f"failures extracted: {total}   distinct causes: {len(clusters)}"
-        f"   distinct roots: {len(roots)}"
+        f"failures extracted: {total} across {len(runs)} runs"
+        f"   distinct causes: {len(clusters)}   distinct roots: {len(roots)}"
     )
-    if reported:
+    for shape in (JobShape.ROBOT, JobShape.UNITTEST):
+        # A parsed job the runner never counted would pad the numerator, so
+        # both sides are restricted to jobs that printed a tally.
+        counted = [k for k in tallies if shapes[k] == shape]
+        if not counted:
+            continue
+        reported = sum(tallies[k].failed for k in counted)
+        extracted = sum(len(per_job[k]) for k in counted)
         print(
-            f"robot reported {reported} across tallied jobs "
-            f"-> coverage {100 * total / reported:.0f}%"
+            f"{shape.value}: reported {reported}, extracted {extracted}"
+            f" -> coverage {100 * extracted / max(reported, 1):.2f}%"
         )
     print(RULE)
 
     if args.unparsed:
-        print("\nfailed jobs with no Robot FAIL: blocks:\n")
-        for run_id, job_id, lines in non_robot:
+        print("\nfailed jobs no parser recognized:\n")
+        for run_id, job_id, lines in unrecognized:
             print(f"  run {run_id}  job {job_id}  {lines:>6} lines")
-        print(f"\n  {len(non_robot)} total. These need a unittest/pytest parser.")
+        print(f"\n  {len(unrecognized)} total.")
         return 0
 
     if args.sig:
@@ -215,6 +227,37 @@ def main() -> int:
                 f"      {n_roots:>4}  ({root_share:>2.0f}%)"
             )
         print("\n  (inspect one with --root-sig <signature>)")
+        return 0
+
+    if args.classify:
+        # Same root, same category, so classify one sample per root.
+        by_category: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+        by_rule: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0])
+        untriaged: list[tuple[int, str]] = []
+        for group in roots.values():
+            members = [f for fs in group.values() for f in fs]
+            result = classify(members[0])
+            for tally in (by_category[result.category], by_rule[(result.category, result.rule)]):
+                tally[0] += len(members)
+                tally[1] += 1
+            if result.category == FailureCategory.UNTRIAGED:
+                untriaged.append((len(members), members[0].root or "(no root extracted)"))
+
+        # Roots are the denominator to read. One collapsed suite is most of the
+        # occurrences, so an occurrence share mostly reports that one root.
+        print("\ncategory        roots            occurrences\n")
+        for category, (occ, n_roots) in sorted(by_category.items(), key=lambda kv: -kv[1][1]):
+            print(
+                f"  {category:<16}{n_roots:>4} ({100 * n_roots / len(roots):>2.0f}%)"
+                f"     {occ:>7} ({100 * occ / total:>2.0f}%)"
+            )
+        print("\nby rule:\n")
+        for (category, rule), (occ, n_roots) in sorted(by_rule.items(), key=lambda kv: -kv[1][1]):
+            print(f"  {category:<16}{rule:<26}{n_roots:>4} roots  {occ:>7} occ")
+        print(f"\nleft for a model, largest first (top {args.top}):\n")
+        for occ, root in sorted(untriaged, reverse=True)[: args.top]:
+            print(f"  {occ:>6}  {root[:100]}")
+        print("\n  flake: not assigned (needs passing runs; see classify.FLAKE_LIMITS)")
         return 0
 
     if args.cascades:

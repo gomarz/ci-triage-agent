@@ -6,7 +6,8 @@ Agentic triage for CI failures: ingest, cluster, propose verified fixes.
 
 1. **Ingest** — fetch GitHub Actions runs and job logs. *Built.*
 2. **Cluster** — group failures by root cause. *Built.*
-3. **Classify** — regression / flake / environment / infrastructure. *Not built.*
+3. **Classify** — regression / flake / environment / infrastructure. *Rules
+   built; flake needs passing runs the corpus lacks.*
 4. **Propose and verify** — patch, re-run, score. *Not built.*
 
 Stage 4 is the point of the project. Grouping failures is a solved
@@ -25,10 +26,17 @@ data/raw/jobs/{run_id}.json         job manifest
 data/raw/logs/{run_id}/{job_id}.txt raw log text, timestamps intact
 ```
 
-251 job logs across 55 runs. 65,532 failures extracted at 100% coverage
-against Robot's own tally. 473 cause signatures, 261 roots. The largest
+251 job logs across 55 runs, every one a failed job. By shape (`jobs.py`):
+180 Robot, 53 unittest, 17 crash, 1 unrecognized. 65,598 failures
+extracted: Robot 65,495 of the 65,503 it reported (99.99%), unittest 86 of
+86, plus 17 job-level crashes. 492 cause signatures, 266 roots. The largest
 root resolves 57,155 failures across 6,397 tests to one missing artifact
 file.
+
+Parsing is per shape. Robot goes first, then unittest, then crash; whatever
+matches none is `unrecognized` and stays in the counts. A crash is one
+record per job (`scope="job"`, `test_id="<job>"`) taken from the first
+traceback, since later ones are consequences.
 
 ## Commands
 
@@ -42,6 +50,8 @@ python scripts/fetch_logs.py                 # resumable; skips cached
 python scripts/peek_failure.py --groups      # what the runner actually ran
 python scripts/cluster_preview.py --roots    # root clusters + rule breakdown
 python scripts/cluster_preview.py --root-sig SIG   # inspect one root
+python scripts/cluster_preview.py --unparsed # failed jobs no parser recognized
+python scripts/cluster_preview.py --classify # category per root, by rule
 ```
 
 `GITHUB_TOKEN` with `actions:read` is required for anything that fetches.
@@ -57,6 +67,24 @@ Root extraction is a ladder (`failed-reason`, `exception`, `diff`,
 it. `first-line` is the weakest and accounts for ~45% of distinct roots.
 That number is the measured gap deterministic rules can't close, and it is
 the justification for a model call — not decoration.
+
+## Classification
+
+`classify.py` maps a root sentence to a `FailureCategory` by ordered rules,
+first match wins, and every result names its rule. It fires only on a strong
+indicator; anything ambiguous stays `UNTRIAGED` for the model. A confident
+wrong category would send stage 4 down the wrong proposal type.
+
+Report it by roots, not occurrences: one missing artifact is 57,155 of 65,598
+failures. 109 of 266 roots (41%) are classified: 19 infrastructure, 57
+regression, 33 environment. Accuracy against labels is unmeasured.
+
+`should be` is not a mismatch signal: Robot uses it for "captured stderr
+should be empty" and inside its own status wrapper.
+
+FLAKE is never assigned. It needs the same test failing and passing on one
+commit. All 100 cached runs are failures on attempt 1, and commits with
+several runs are different workflows, not reruns. See `classify.FLAKE_LIMITS`.
 
 ## Gotchas that cost real time
 
@@ -77,6 +105,26 @@ the final group, so "last group" is teardown, never the failure. Anchor on
 
 **Robot's separator is 100 dashes; unittest's is 70.** Splitting on `-{70,}`
 shreds nested unittest tracebacks. `extract._RULE` requires 90+.
+
+**unittest prints `FAIL:` too.** With no Robot rule in the log,
+`extract_failures` used to see one chunk, and the first unittest `FAIL:` swallowed
+the rest of the log (up to 146 KB) as a single "Robot failure". 37 jobs
+were counted that way, and the extras hid an 8-failure shortfall inside a
+rounded "100%". `extract_failures` now returns nothing without a 90+
+rule.
+
+**Verbose unittest prints every failure twice.** Once inline while it runs
+(`name (id) ... ERROR`), once as a block between two 70-character rules. Only
+the block has the traceback. A block ends at the next rule, not the next
+`Traceback`: chained exceptions put two inside one block.
+
+**Compare coverage like for like.** Extracted failures from jobs that printed
+a tally against the tallies, nothing else. Comparing all extracted failures to
+the tallied subset is what let the 37 extras through.
+
+**Robot capitalises only the first word.** "Setup failed:" but "Parent suite
+setup failed:". The wrapper regex matched only the capitalised form, so 959
+failures kept a wrapper as their root with the real cause on the next line.
 
 **The unit of aggregation is the job, not the run.** A matrix run has many
 jobs, each with its own tally. Summing jobs while comparing against one
@@ -105,12 +153,11 @@ is 3.13+. Passing locally means nothing.
 
 ## Next
 
-Classification. `FailureCategory` exists in `models.py` and nothing sets it.
-Rule-based first — the top roots map cleanly (`FileNotFoundError` on a build
-artifact → INFRASTRUCTURE, a missing module → ENVIRONMENT, an assertion
-change → REGRESSION).
-
-After that, verification needs a target repo we can actually push to.
+Verification needs a target repo we can actually push to.
 `robotframework/robotframework` can't be pushed to and its suite takes 12
 minutes. A small repo with deliberately seeded failures gives ground truth,
-which is what makes cheat-rate measurable rather than aspirational.
+which is what makes cheat-rate measurable rather than aspirational. The same
+repo can measure classification accuracy: seed a known missing dependency, a
+known assertion change, a known flake, and check the category.
+
+Flake detection needs passing runs; the current corpus has none.
