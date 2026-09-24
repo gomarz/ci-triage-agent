@@ -56,6 +56,28 @@ python scripts/cluster_preview.py --classify # category per root, by rule
 
 `GITHUB_TOKEN` with `actions:read` is required for anything that fetches.
 
+## Second corpus: the testbed
+
+`gomarz/ci-triage-testbed` is a small repo with a green `main` and six seeded
+failures on `seed/*` branches, each with a known category and fix (ground truth
+in that repo's `seeds/manifest.json`). It lives in its own data directory so
+its logs never mix into the Robot counts above. Every script reads `DATA_DIR`
+(default `data`; a relative path resolves from the working directory):
+
+```
+export DATA_DIR=data/testbed
+python -m ci_triage.ingest --repo gomarz/ci-triage-testbed --include-passing
+python scripts/fetch_logs.py --all-runs      # passing runs too, jobs fetched whole
+python scripts/cluster_preview.py --roots
+```
+
+Ingest defaults are unchanged: failures only, one page of 100, `TARGET_REPO`.
+`--pages N` reads further back. The runs listing returns each run's **latest
+attempt only**, so a re-run failure shows up as a pass and its first attempt is
+lost from the cache (`/runs/{id}/attempts/{n}` would recover it; not built).
+The 9 cached runs of the s05 commit are 5 failed and 4 passed, all from
+separate dispatches.
+
 ## Three signature levels
 
 - `root_sig` — what broke. Coarsest. Merges differently-worded symptoms.
@@ -92,7 +114,8 @@ Each of these was found by being wrong first. Don't rediscover them.
 
 **The logs endpoint 302s to a signed blob URL.** The httpx client must set
 `follow_redirects=True` or every log comes back empty and looks like a data
-problem. See `logs.build_client`.
+problem. See `logs.build_client`. (It was imported by both fetch scripts for
+weeks without ever being committed; a fresh checkout could not fetch anything.)
 
 **Windows-runner logs are CRLF.** Python's translating writer turns those
 into CRLFLF, doubling every line. `cache_log` writes with `newline=""`;
