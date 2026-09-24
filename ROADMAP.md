@@ -5,7 +5,9 @@ Status line and the Now section as things move; leave the measured baseline
 alone unless you re-measure.
 
 **Status:** stages 1 and 2 built and measured, across Robot, unittest and
-job-level crash logs. Stage 3 not started.
+job-level crash logs. Stage 3 built as rules for regression, environment and
+infrastructure; flake needs passing runs the corpus doesn't have. Stage 4 not
+started.
 
 ---
 
@@ -15,7 +17,7 @@ job-level crash logs. Stage 3 not started.
 |---|-------|-------|
 | 1 | **Ingest** — fetch runs and job logs from GitHub Actions | Built |
 | 2 | **Cluster** — group failures by root cause | Built |
-| 3 | **Classify** — regression / flake / environment / infrastructure | Not started |
+| 3 | **Classify** — regression / flake / environment / infrastructure | Rules built; flake blocked on data |
 | 4 | **Propose and verify** — patch, re-run, score | Not started |
 
 Stage 4 is the reason the project exists. Stages 1–3 are commodity; several
@@ -35,15 +37,16 @@ Reproduce with `python scripts/cluster_preview.py --roots`.
 | Failures extracted | 65,598 (Robot 65,495 · unittest 86 · crash 17) |
 | Coverage vs the runner's own tally | Robot 99.99% (65,495 / 65,503) · unittest 100% (86 / 86) |
 | Distinct cause signatures | 492 |
-| Distinct roots | 267 |
+| Distinct roots | 266 |
 | Largest root | 57,155 failures / 6,397 tests → one missing artifact |
 | Unclassified | 139 occ (0%), 1 bucket |
+| Roots with a category | 109 of 266 (41%): infrastructure 19 · regression 57 · environment 33 |
 
 Extraction rules, by share of distinct roots:
 
 ```
 failed-reason    9%      exception   23%
-first-line      46%      diff        22%
+first-line      45%      diff        23%
 ```
 
 The earlier baseline (65,532 failures, "100%") counted 37 unittest jobs as
@@ -105,26 +108,32 @@ were not one thing, so the work split by shape (`jobs.py`):
 
 No pytest logs exist in the corpus, so there is no pytest parser.
 
-### 1. Classification
+### Done: rule-based classification
 
-`FailureCategory` has existed in `models.py` since the scaffold and nothing
-sets it. Rule-based first — the top roots map cleanly:
+`classify.py`. Rules fire only on a strong indicator and each result names
+its rule; ambiguous roots stay `UNTRIAGED` for the model.
 
-- `FileNotFoundError` on a build artifact → INFRASTRUCTURE
-- missing module / dependency → ENVIRONMENT
-- assertion or error-message change → REGRESSION
-- same test passing and failing across runs of one commit → FLAKE
+- missing build artifact or file → INFRASTRUCTURE
+- missing module, or a stdlib name newer than the interpreter → ENVIRONMENT
+- assertion, or an actual-against-expected mismatch → REGRESSION
 
-Classification is what turns a cluster list into something actionable, and
-it's what stage 4 keys its proposal type off.
+109 of 266 roots are classified. Read `cluster_preview.py --classify` for the
+breakdown and the largest roots left over. Accuracy against labels is
+unmeasured; that needs the seeded repo below.
 
-### 2. Verification target
+Blocked: **FLAKE**. It needs the same test failing in one run and passing in
+another on one commit. All 100 cached runs are failures on attempt 1, and the
+commits with several runs are different workflows. Detecting flakes means
+fetching successful runs, or later attempts, for commits already cached.
+
+### 1. Verification target
 
 Stage 4 can't be built without somewhere to actually run tests.
 `robotframework/robotframework` can't be pushed to and its suite takes 12
-minutes. See Open decisions.
+minutes. See Open decisions. The same repo can measure classification
+accuracy and give flake detection its passing runs.
 
-### 3. Agent loop and eval harness
+### 2. Agent loop and eval harness
 
 Fix proposal, then scoring on two axes: **fix rate** (did the suite pass)
 and **cheat rate** (did the patch weaken or delete the assertion). High fix

@@ -15,7 +15,8 @@ compared like for like: only jobs that printed a tally count on either side.
 
 Usage:
     python scripts/cluster_preview.py [--top 15] [--cascades] [--sig SIG]
-                                      [--unparsed]
+                                      [--roots] [--root-sig SIG] [--classify]
+                                      [--compression] [--unparsed]
 """
 
 from __future__ import annotations
@@ -27,8 +28,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from ci_triage.classify import FLAKE_LIMITS, classify
 from ci_triage.jobs import JobShape, parse_job
 from ci_triage.logs import diagnostic_body, read_log
+from ci_triage.models import FailureCategory
 
 ROOT = Path(__file__).resolve().parent.parent
 LOGS = ROOT / "data" / "raw" / "logs"
@@ -47,6 +50,11 @@ def main() -> int:
         "--compression",
         action="store_true",
         help="Per-job failures -> causes -> roots.",
+    )
+    parser.add_argument(
+        "--classify",
+        action="store_true",
+        help="Category per root cluster, by rule, plus what is left untriaged.",
     )
     parser.add_argument(
         "--unparsed",
@@ -219,6 +227,37 @@ def main() -> int:
                 f"      {n_roots:>4}  ({root_share:>2.0f}%)"
             )
         print("\n  (inspect one with --root-sig <signature>)")
+        return 0
+
+    if args.classify:
+        # Same root, same category, so classify one sample per root.
+        by_category: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+        by_rule: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0])
+        untriaged: list[tuple[int, str]] = []
+        for group in roots.values():
+            members = [f for fs in group.values() for f in fs]
+            result = classify(members[0])
+            for tally in (by_category[result.category], by_rule[(result.category, result.rule)]):
+                tally[0] += len(members)
+                tally[1] += 1
+            if result.category == FailureCategory.UNTRIAGED:
+                untriaged.append((len(members), members[0].root or "(no root extracted)"))
+
+        # Roots are the honest denominator. One collapsed suite is most of the
+        # occurrences, so an occurrence share mostly reports that one root.
+        print("\ncategory        roots            occurrences\n")
+        for category, (occ, n_roots) in sorted(by_category.items(), key=lambda kv: -kv[1][1]):
+            print(
+                f"  {category:<16}{n_roots:>4} ({100 * n_roots / len(roots):>2.0f}%)"
+                f"     {occ:>7} ({100 * occ / total:>2.0f}%)"
+            )
+        print("\nby rule:\n")
+        for (category, rule), (occ, n_roots) in sorted(by_rule.items(), key=lambda kv: -kv[1][1]):
+            print(f"  {category:<16}{rule:<26}{n_roots:>4} roots  {occ:>7} occ")
+        print(f"\nleft for a model, largest first (top {args.top}):\n")
+        for occ, root in sorted(untriaged, reverse=True)[: args.top]:
+            print(f"  {occ:>6}  {root[:100]}")
+        print(f"\n  flake: not assigned. {FLAKE_LIMITS.splitlines()[0]} ...")
         return 0
 
     if args.cascades:
