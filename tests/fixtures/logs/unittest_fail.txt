@@ -1,0 +1,45 @@
+﻿2026-07-04T12:05:35.8181657Z Current runner version: '2.335.1'
+2026-07-04T12:05:57.8120084Z test_set_invalid (test_variables.TestVariables) ... ok
+2026-07-04T12:05:57.8124980Z test_set_list (test_variables.TestVariables) ... ok
+2026-07-04T12:05:57.8130566Z test_set_scalar (test_variables.TestVariables) ... ok
+2026-07-04T12:05:57.8135372Z test_space_is_not_ignored_after_newline_in_extend_variable_syntax (test_variables.TestVariables) ... ok
+2026-07-04T12:05:57.8136984Z test_variable_as_object (test_variables.TestVariables) ... ok
+2026-07-04T12:05:57.8139991Z test_variables_in_value (test_variables.TestVariables) ... ok
+2026-07-04T12:05:57.8140554Z 
+2026-07-04T12:05:57.8140776Z ======================================================================
+2026-07-04T12:05:57.8141393Z FAIL: test_roundtrip_from_python (test_libdoc.TestJson)
+2026-07-04T12:05:57.8142003Z ----------------------------------------------------------------------
+2026-07-04T12:05:57.8142647Z Traceback (most recent call last):
+2026-07-04T12:05:57.8151185Z   File "/home/runner/work/robotframework/robotframework/utest/libdoc/test_libdoc.py", line 242, in test_roundtrip_from_python
+2026-07-04T12:05:57.8152298Z     self._test("DynamicLibrary.py::required")
+2026-07-04T12:05:57.8153208Z   File "/home/runner/work/robotframework/robotframework/utest/libdoc/test_libdoc.py", line 260, in _test
+2026-07-04T12:05:57.8154038Z     self.assertDictEqual(data, orig_data)
+2026-07-04T12:05:57.8155229Z AssertionError: {'spe[224 chars]home/runner/work/robotframework/robotframework[28485 chars]']}]} != {'spe[224 chars]home/peke/Devel/robotframework/atest/testdata/[28181 chars]']}]}
+2026-07-04T12:05:57.8156931Z   {'doc': '<p>Dummy documentation for <span class="name">__intro__</span>.</p>',
+2026-07-04T12:05:57.8157552Z    'docFormat': 'HTML',
+2026-07-04T12:05:57.8490587Z                         '<code>1.1</code> is not.</p>\n'
+2026-07-04T12:05:57.8490743Z                         '<p>It is possible to use hexadecimal, octal and binary '
+2026-07-04T12:05:57.8490884Z                         'numbers by prefixing values with <code>0x</code>, '
+2026-07-04T12:05:57.8491032Z                         '<code>0o</code> and <code>0b</code>, respectively. '
+2026-07-04T12:05:57.8491197Z                         'Spaces and underscores can be used as visual separators '
+2026-07-04T12:05:57.8491321Z                         'for digit grouping purposes.</p>\n'
+2026-07-04T12:05:57.8491452Z                         '<p>Examples: <code>42</code>, <code>-1</code>, '
+2026-07-04T12:05:57.8491575Z                         '<code>0b1010</code>, <code>10 000 000</code>, '
+2026-07-04T12:05:57.8491686Z                         '<code>0xBAD_C0FFEE</code></p>',
+2026-07-04T12:05:57.8491777Z                  'name': 'integer',
+2026-07-04T12:05:57.8491860Z                  'type': 'Standard',
+2026-07-04T12:05:57.8491953Z                  'usages': ['Types']}],
+2026-07-04T12:05:57.8492031Z    'version': '0.1'}
+2026-07-04T12:05:57.8492037Z 
+2026-07-04T12:05:57.8492178Z ----------------------------------------------------------------------
+2026-07-04T12:05:57.8492379Z Ran 2393 tests in 9.852s
+2026-07-04T12:05:57.8492384Z 
+2026-07-04T12:05:57.8492469Z FAILED (failures=1)
+2026-07-04T12:05:57.8819660Z ##[error]Process completed with exit code 1.
+2026-07-04T12:05:57.8953977Z Post job cleanup.
+2026-07-04T12:05:57.9773592Z [command]/usr/bin/git version
+2026-07-04T12:05:57.9846220Z git version 2.54.0
+2026-07-04T12:05:57.9886959Z Temporarily overriding HOME='/home/runner/work/_temp/ca907962-6ad0-4a97-9a2c-243e1cf52544' before making global git config changes
+2026-07-04T12:05:57.9888363Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-04T12:05:57.9893847Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/robotframework/robotframework
+2026-07-04T12:05:57.9932804Z Removing SSH command configuration
