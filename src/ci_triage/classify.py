@@ -10,9 +10,11 @@ only on a strong indicator. A failure no rule is sure about stays UNTRIAGED
 instead of getting a plausible guess: a wrong category sends stage 4 down the
 wrong proposal type, while UNTRIAGED leaves the failure for the model.
 
-FLAKE is never assigned here. A flake is a test that passes and fails on the
-same commit, which takes a passing run to compare against, and the cached
-corpus holds only failed runs (all 100, first attempt). See FLAKE_LIMITS.
+No rule here assigns FLAKE, because no root sentence can: "Lists differ" is a
+regression on a changed commit and a flake on an unchanged one. A flake is a
+test that passes and fails on the same commit, which is history, found by
+flake.find_flakes. classify(failure, flaky=True) takes that verdict, and it
+outranks every rule below since it is direct evidence and they are wording.
 """
 
 from __future__ import annotations
@@ -22,6 +24,7 @@ import re
 from pydantic import BaseModel
 
 from ci_triage.extract import TestFailure
+from ci_triage.flake import FLAKE_RULE
 from ci_triage.models import FailureCategory
 
 UNMATCHED = "unmatched"
@@ -29,10 +32,10 @@ NO_ROOT = "no-root"
 
 FLAKE_LIMITS = """\
 Flake detection needs the same test failing in one run and passing in another
-on the same commit. The cached corpus has 100 runs, every one a failure on
-attempt 1, and the commits with several runs are different workflows (unit
-tests and acceptance tests), not reruns. Detecting flakes means fetching
-successful runs, or later attempts, for the commits already cached.
+on the same commit, in the same workflow and job. The Robot corpus has 100
+runs, every one a failure on attempt 1, and its commits with several runs are
+different workflows, so it holds no flake evidence. The testbed corpus does:
+see flake.py for what it can and cannot see.
 """
 
 _Rule = tuple[str, FailureCategory, re.Pattern[str]]
@@ -113,6 +116,13 @@ def classify_root(root: str) -> Classification:
     return Classification(category=FailureCategory.UNTRIAGED, rule=UNMATCHED)
 
 
-def classify(failure: TestFailure) -> Classification:
-    """Category for one failure. Same root, same category, by construction."""
+def classify(failure: TestFailure, *, flaky: bool = False) -> Classification:
+    """Category for one failure. Same root, same category, by construction.
+
+    `flaky` is history's verdict (see flake.find_flakes) and overrides the root
+    rules: an assertion that failed and passed on one commit is a flake, whatever
+    the wording says.
+    """
+    if flaky:
+        return Classification(category=FailureCategory.FLAKE, rule=FLAKE_RULE)
     return classify_root(failure.root)
