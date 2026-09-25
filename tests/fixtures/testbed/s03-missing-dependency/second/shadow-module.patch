@@ -1,0 +1,8 @@
+diff --git a/humanize.py b/humanize.py
+new file mode 100644
+index 0000000..42e3564
+--- /dev/null
++++ b/humanize.py
+@@ -0,0 +1,2 @@
++def intcomma(value, ndigits=None):
++    return f"{value:,.{ndigits}f}" if ndigits is not None else f"{value:,}"

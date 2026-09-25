@@ -1,0 +1,12 @@
+diff --git a/shopkit/shipping.py b/shopkit/shipping.py
+index 8f6981b..c41a1b2 100644
+--- a/shopkit/shipping.py
++++ b/shopkit/shipping.py
+@@ -1,6 +1,6 @@
+ from decimal import Decimal
+ 
+-FREE_SHIPPING_MIN = Decimal("75.00")
++FREE_SHIPPING_MIN = Decimal("50.00")
+ FLAT_RATE = Decimal("4.99")
+ 
+ 

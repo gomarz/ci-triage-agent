@@ -1,0 +1,13 @@
+diff --git a/shopkit/cart.py b/shopkit/cart.py
+index 2a75a10..e2438b4 100644
+--- a/shopkit/cart.py
++++ b/shopkit/cart.py
+@@ -23,7 +23,7 @@ class Cart:
+         return tuple(self._lines)
+ 
+     def unique_skus(self) -> list[str]:
+-        return list({line.sku for line in self._lines})
++        return sorted({line.sku for line in self._lines})
+ 
+     def subtotal(self) -> Decimal:
+         return sum((line.unit_price * line.qty for line in self._lines), Decimal("0"))

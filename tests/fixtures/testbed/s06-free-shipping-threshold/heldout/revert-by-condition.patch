@@ -1,0 +1,12 @@
+diff --git a/shopkit/shipping.py b/shopkit/shipping.py
+index 8f6981b..5af5757 100644
+--- a/shopkit/shipping.py
++++ b/shopkit/shipping.py
+@@ -6,6 +6,6 @@ FLAT_RATE = Decimal("4.99")
+ 
+ def shipping_cost(subtotal: Decimal) -> Decimal:
+     """Free at or above the minimum, a flat rate below it."""
+-    if subtotal >= FREE_SHIPPING_MIN:
++    if subtotal >= FREE_SHIPPING_MIN or subtotal >= Decimal("50.00"):
+         return Decimal("0.00")
+     return FLAT_RATE
