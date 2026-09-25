@@ -71,6 +71,7 @@ python -m ci_triage.ingest --repo gomarz/ci-triage-testbed --include-passing
 python scripts/fetch_logs.py --all-runs      # passing runs too, jobs fetched whole
 python scripts/cluster_preview.py --roots
 python scripts/flake_preview.py              # tests that passed and failed on one commit
+python scripts/score_classifier.py --manifest ../ci-triage-testbed/seeds/manifest.json
 ```
 
 Ingest defaults are unchanged: failures only, one page of 100, `TARGET_REPO`.
@@ -101,7 +102,8 @@ wrong category would send stage 4 down the wrong proposal type.
 
 Report it by roots, not occurrences: one missing artifact is 57,155 of 65,598
 failures. 109 of 266 roots (41%) are classified: 19 infrastructure, 57
-regression, 33 environment. Accuracy against labels is unmeasured.
+regression, 33 environment. That is coverage. The Robot corpus has no labels,
+so accuracy is measured on the testbed instead (below).
 
 `should be` is not a mismatch signal: Robot uses it for "captured stderr
 should be empty" and inside its own status wrapper.
@@ -121,6 +123,25 @@ it finds none, and the reason is measurable: 53 jobs have per-test results, in
 (not parsed), a failure that was re-run and passed (only the latest attempt is
 cached), and a test that prints to stdout mid-result-line (left out, not
 guessed). See `classify.FLAKE_LIMITS` and the `flake.py` docstring.
+
+**Accuracy on the testbed** (`scripts/score_classifier.py --manifest
+../ci-triage-testbed/seeds/manifest.json`, with `DATA_DIR=data/testbed`). Six
+seeds, one row each, because one seed is one cause. UNTRIAGED is an abstention,
+not an error, so there are two numbers: how often it answers and how often an
+answer is right.
+
+| | correct | wrong | abstained | right when it answers |
+|---|---|---|---|---|
+| root rules alone | 4 | 1 | 1 | 4/5 |
+| with run history | 5 | 0 | 1 | 5/5 |
+
+The wrong one is s05, the flake, called a regression by its wording. The
+abstention is s02, a `TypeError` from a refactor that missed one caller, which
+no rule matches: the case the model call is for. Treat this as a check that the
+pipeline works end to end, not a benchmark. The seeds were written by someone
+who had read the rules, six cases give no confidence interval worth quoting, and
+the labels are the author's judgement (s06, an intended change with a stale
+test, is labelled regression).
 
 ## Gotchas that cost real time
 
@@ -197,7 +218,8 @@ which is what makes cheat-rate measurable rather than aspirational. The same
 repo can measure classification accuracy: seed a known missing dependency, a
 known assertion change, a known flake, and check the category.
 
-Flake detection is built. Accuracy against the testbed's labels is the next
-measurement: run every seed through parse, classify and flake detection, and
-compare with `seeds/manifest.json`. Recovering re-run attempts
+Flake detection and the accuracy check are built. Stage 4 is next: the seeds'
+manifest already lists the correct fix files and the cheats to look for.
+Separately, six seeds are too few to say anything about accuracy; more seeds,
+ideally written without reading `classify.py`, would. Recovering re-run attempts
 (`/runs/{id}/attempts/{n}`) would stop a re-run failure from vanishing.
