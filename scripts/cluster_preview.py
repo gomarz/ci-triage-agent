@@ -257,7 +257,7 @@ def main() -> int:
         print(f"\nleft for a model, largest first (top {args.top}):\n")
         for occ, root in sorted(untriaged, reverse=True)[: args.top]:
             print(f"  {occ:>6}  {root[:100]}")
-        print("\n  flake: not assigned (needs passing runs; see classify.FLAKE_LIMITS)")
+        print("\n  flake: not assigned here (needs history; see scripts/flake_preview.py)")
         return 0
 
     if args.cascades:
