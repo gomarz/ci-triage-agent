@@ -50,6 +50,7 @@ class JobObservation(BaseModel):
     commit_sha: str
     workflow_id: int
     run_attempt: int = 1
+    branch: str = ""
     outcomes: dict[str, Outcome] = Field(default_factory=dict)
 
 
@@ -133,6 +134,7 @@ def load_observations(data_dir: Path) -> list[JobObservation]:
                     commit_sha=run.commit_sha,
                     workflow_id=run.workflow_id,
                     run_attempt=run.run_attempt,
+                    branch=run.branch,
                     outcomes=extract_unittest_outcomes(diagnostic_body(read_log(log))),
                 )
             )
