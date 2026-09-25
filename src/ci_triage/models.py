@@ -32,6 +32,15 @@ class Conclusion(StrEnum):
     STARTUP_FAILURE = "startup_failure"
 
 
+class Outcome(StrEnum):
+    """What one test did in one job, as the runner printed it."""
+
+    PASS = "pass"
+    FAIL = "fail"
+    ERROR = "error"
+    SKIP = "skip"
+
+
 #: Conclusions that represent something worth triaging. A cancelled run was
 #: killed by a human, a skipped run never executed, and a startup_failure
 #: never produced job logs, so none of them carry a diagnosable signal.

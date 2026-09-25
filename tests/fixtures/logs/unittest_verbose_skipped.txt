@@ -1,0 +1,7 @@
+2026-08-21T10:04:23.9227951Z test_nested_params (_test_typealiasresolver.TestTypeAliasResolver.test_nested_params) ... ok
+2026-08-21T10:04:23.9229096Z test_non_existing (_test_typealiasresolver.TestTypeAliasResolver.test_non_existing) ... ok
+2026-08-21T10:04:23.9230332Z test_param_arg (_test_typealiasresolver.TestTypeAliasResolver.test_param_arg) ... ok
+2026-08-21T10:04:23.9231652Z test_param_defaults (_test_typealiasresolver.TestTypeAliasResolver.test_param_defaults) ... skipped 'Defaults require Python 3.13'
+2026-08-21T10:04:23.9232976Z test_param_reuse (_test_typealiasresolver.TestTypeAliasResolver.test_param_reuse) ... ok
+2026-08-21T10:04:23.9234164Z test_param_to_scalar_value (_test_typealiasresolver.TestTypeAliasResolver.test_param_to_scalar_value) ... ok
+2026-08-21T10:04:23.9235802Z test_params (_test_typealiasresolver.TestTypeAliasResolver.test_params) ... ok

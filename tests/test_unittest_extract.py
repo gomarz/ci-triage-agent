@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from ci_triage.extract import extract_failures
 from ci_triage.logs import strip_timestamps
-from ci_triage.unittest_extract import extract_unittest_failures, parse_unittest_tally
+from ci_triage.models import Outcome
+from ci_triage.unittest_extract import (
+    extract_unittest_failures,
+    extract_unittest_outcomes,
+    parse_unittest_tally,
+)
 
 
 def test_one_failure_per_block(log):
@@ -109,3 +114,52 @@ def test_tally_ignores_outcomes_that_print_no_block():
 
 def test_tally_absent():
     assert parse_unittest_tally("nothing here") is None
+
+
+TEST_ID = "test_unique_skus (tests.test_cart.CartTests.test_unique_skus)"
+
+
+def test_outcomes_of_a_passing_run(log):
+    outcomes = extract_unittest_outcomes(strip_timestamps(log("unittest_verbose_pass.txt")))
+    assert len(outcomes) == 18
+    assert set(outcomes.values()) == {Outcome.PASS}
+
+
+def test_outcomes_of_a_failing_run(log):
+    outcomes = extract_unittest_outcomes(strip_timestamps(log("unittest_verbose_flaky_fail.txt")))
+    assert outcomes[TEST_ID] is Outcome.FAIL
+    assert sum(o is Outcome.PASS for o in outcomes.values()) == 17
+
+
+def test_outcome_ids_match_failure_block_ids(log):
+    """Outcomes only join against failures if both spell the test the same way."""
+    text = strip_timestamps(log("unittest_verbose_flaky_fail.txt"))
+    failed = {f.test_id for f in extract_unittest_failures(text)}
+    assert failed == {t for t, o in extract_unittest_outcomes(text).items() if o is Outcome.FAIL}
+
+
+def test_skipped_test_is_a_skip_not_a_pass(log):
+    outcomes = extract_unittest_outcomes(strip_timestamps(log("unittest_verbose_skipped.txt")))
+    skipped = (
+        "test_param_defaults (_test_typealiasresolver.TestTypeAliasResolver.test_param_defaults)"
+    )
+    assert outcomes[skipped] is Outcome.SKIP
+    assert Outcome.PASS in outcomes.values()
+
+
+def test_the_worse_outcome_wins_when_a_test_runs_twice(log):
+    text = strip_timestamps(log("unittest_verbose_pass.txt"))
+    again = text.replace(
+        "test_unique_skus (tests.test_cart.CartTests.test_unique_skus) ... ok",
+        "test_unique_skus (tests.test_cart.CartTests.test_unique_skus) ... FAIL",
+    )
+    both = text + again
+    assert extract_unittest_outcomes(both)[TEST_ID] is Outcome.FAIL
+    assert extract_unittest_outcomes(again + text)[TEST_ID] is Outcome.FAIL
+
+
+def test_a_quiet_run_has_no_outcomes(log):
+    assert (
+        extract_unittest_outcomes("..E.F\n\nRan 5 tests in 0.1s\n\nFAILED (failures=1, errors=1)")
+        == {}
+    )

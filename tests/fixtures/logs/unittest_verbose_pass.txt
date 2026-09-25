@@ -1,0 +1,34 @@
+2026-09-24T16:45:21.4626053Z ##[group]Run python -m unittest discover -s tests -t . -v
+2026-09-24T16:45:21.4628109Z [36;1mpython -m unittest discover -s tests -t . -v[0m
+2026-09-24T16:45:21.4695304Z shell: /usr/bin/bash -e {0}
+2026-09-24T16:45:21.4696649Z env:
+2026-09-24T16:45:21.4697827Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-24T16:45:21.4699756Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-24T16:45:21.4701701Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-24T16:45:21.4703449Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-24T16:45:21.4705224Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-24T16:45:21.4707273Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-24T16:45:21.4708799Z ##[endgroup]
+2026-09-24T16:45:21.9342311Z test_empty_cart_is_zero (tests.test_cart.CartTests.test_empty_cart_is_zero) ... ok
+2026-09-24T16:45:21.9343889Z test_rejects_zero_quantity (tests.test_cart.CartTests.test_rejects_zero_quantity) ... ok
+2026-09-24T16:45:21.9345063Z test_subtotal_sums_lines (tests.test_cart.CartTests.test_subtotal_sums_lines) ... ok
+2026-09-24T16:45:21.9345870Z test_unique_skus (tests.test_cart.CartTests.test_unique_skus) ... ok
+2026-09-24T16:45:21.9347766Z test_discount_applies_before_tax (tests.test_checkout.OrderTotalTests.test_discount_applies_before_tax) ... ok
+2026-09-24T16:45:21.9349854Z test_large_order_ships_free_and_is_taxed (tests.test_checkout.OrderTotalTests.test_large_order_ships_free_and_is_taxed) ... ok
+2026-09-24T16:45:21.9351674Z test_small_order_pays_shipping (tests.test_checkout.OrderTotalTests.test_small_order_pays_shipping) ... ok
+2026-09-24T16:45:21.9353375Z test_adds_tax (tests.test_pricing.AddTaxTests.test_adds_tax) ... ok
+2026-09-24T16:45:21.9354450Z test_zero_rate_is_unchanged (tests.test_pricing.AddTaxTests.test_zero_rate_is_unchanged) ... ok
+2026-09-24T16:45:21.9355737Z test_half_cent_rounds_up (tests.test_pricing.ApplyDiscountTests.test_half_cent_rounds_up) ... ok
+2026-09-24T16:45:21.9357190Z test_percentage_off (tests.test_pricing.ApplyDiscountTests.test_percentage_off) ... ok
+2026-09-24T16:45:21.9358572Z test_rejects_more_than_100_percent (tests.test_pricing.ApplyDiscountTests.test_rejects_more_than_100_percent) ... ok
+2026-09-24T16:45:21.9360145Z test_zero_percent_is_unchanged (tests.test_pricing.ApplyDiscountTests.test_zero_percent_is_unchanged) ... ok
+2026-09-24T16:45:21.9361674Z test_flat_rate_below_threshold (tests.test_shipping.ShippingTests.test_flat_rate_below_threshold) ... ok
+2026-09-24T16:45:21.9362905Z test_free_at_threshold (tests.test_shipping.ShippingTests.test_free_at_threshold) ... ok
+2026-09-24T16:45:21.9363857Z test_known_state (tests.test_tax.RateForTests.test_known_state) ... ok
+2026-09-24T16:45:21.9364787Z test_unknown_state_raises (tests.test_tax.RateForTests.test_unknown_state_raises) ... ok
+2026-09-24T16:45:21.9365480Z test_untaxed_state (tests.test_tax.RateForTests.test_untaxed_state) ... ok
+2026-09-24T16:45:21.9365798Z 
+2026-09-24T16:45:21.9365967Z ----------------------------------------------------------------------
+2026-09-24T16:45:21.9366345Z Ran 18 tests in 0.002s
+2026-09-24T16:45:21.9366665Z 
+2026-09-24T16:45:21.9366753Z OK

@@ -1,0 +1,50 @@
+2026-09-24T16:45:27.1590910Z ##[group]Run python -m unittest discover -s tests -t . -v
+2026-09-24T16:45:27.1591451Z [36;1mpython -m unittest discover -s tests -t . -v[0m
+2026-09-24T16:45:27.1628049Z shell: /usr/bin/bash -e {0}
+2026-09-24T16:45:27.1628505Z env:
+2026-09-24T16:45:27.1628963Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-24T16:45:27.1629473Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-24T16:45:27.1629972Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-24T16:45:27.1630455Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-24T16:45:27.1630917Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-24T16:45:27.1631391Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-24T16:45:27.1631788Z ##[endgroup]
+2026-09-24T16:45:27.3962683Z test_empty_cart_is_zero (tests.test_cart.CartTests.test_empty_cart_is_zero) ... ok
+2026-09-24T16:45:27.3964399Z test_rejects_zero_quantity (tests.test_cart.CartTests.test_rejects_zero_quantity) ... ok
+2026-09-24T16:45:27.3968558Z test_subtotal_sums_lines (tests.test_cart.CartTests.test_subtotal_sums_lines) ... ok
+2026-09-24T16:45:27.3969550Z test_unique_skus (tests.test_cart.CartTests.test_unique_skus) ... FAIL
+2026-09-24T16:45:27.3970904Z test_discount_applies_before_tax (tests.test_checkout.OrderTotalTests.test_discount_applies_before_tax) ... ok
+2026-09-24T16:45:27.3972504Z test_large_order_ships_free_and_is_taxed (tests.test_checkout.OrderTotalTests.test_large_order_ships_free_and_is_taxed) ... ok
+2026-09-24T16:45:27.3973966Z test_small_order_pays_shipping (tests.test_checkout.OrderTotalTests.test_small_order_pays_shipping) ... ok
+2026-09-24T16:45:27.3975576Z test_adds_tax (tests.test_pricing.AddTaxTests.test_adds_tax) ... ok
+2026-09-24T16:45:27.3976947Z test_zero_rate_is_unchanged (tests.test_pricing.AddTaxTests.test_zero_rate_is_unchanged) ... ok
+2026-09-24T16:45:27.3977998Z test_half_cent_rounds_up (tests.test_pricing.ApplyDiscountTests.test_half_cent_rounds_up) ... ok
+2026-09-24T16:45:27.3979087Z test_percentage_off (tests.test_pricing.ApplyDiscountTests.test_percentage_off) ... ok
+2026-09-24T16:45:27.3980098Z test_rejects_more_than_100_percent (tests.test_pricing.ApplyDiscountTests.test_rejects_more_than_100_percent) ... ok
+2026-09-24T16:45:27.3981373Z test_zero_percent_is_unchanged (tests.test_pricing.ApplyDiscountTests.test_zero_percent_is_unchanged) ... ok
+2026-09-24T16:45:27.3982660Z test_flat_rate_below_threshold (tests.test_shipping.ShippingTests.test_flat_rate_below_threshold) ... ok
+2026-09-24T16:45:27.3983400Z test_free_at_threshold (tests.test_shipping.ShippingTests.test_free_at_threshold) ... ok
+2026-09-24T16:45:27.3984003Z test_known_state (tests.test_tax.RateForTests.test_known_state) ... ok
+2026-09-24T16:45:27.3984570Z test_unknown_state_raises (tests.test_tax.RateForTests.test_unknown_state_raises) ... ok
+2026-09-24T16:45:27.3985227Z test_untaxed_state (tests.test_tax.RateForTests.test_untaxed_state) ... ok
+2026-09-24T16:45:27.3985561Z 
+2026-09-24T16:45:27.3985986Z ======================================================================
+2026-09-24T16:45:27.3986645Z FAIL: test_unique_skus (tests.test_cart.CartTests.test_unique_skus)
+2026-09-24T16:45:27.3987130Z ----------------------------------------------------------------------
+2026-09-24T16:45:27.3987550Z Traceback (most recent call last):
+2026-09-24T16:45:27.3992675Z   File "/home/runner/work/ci-triage-testbed/ci-triage-testbed/tests/test_cart.py", line 19, in test_unique_skus
+2026-09-24T16:45:27.3993383Z     self.assertEqual(cart.unique_skus(), ["apple", "pear"])
+2026-09-24T16:45:27.3993947Z AssertionError: Lists differ: ['pear', 'apple'] != ['apple', 'pear']
+2026-09-24T16:45:27.3994246Z 
+2026-09-24T16:45:27.3994439Z First differing element 0:
+2026-09-24T16:45:27.3994754Z 'pear'
+2026-09-24T16:45:27.3995055Z 'apple'
+2026-09-24T16:45:27.3995261Z 
+2026-09-24T16:45:27.3995397Z - ['pear', 'apple']
+2026-09-24T16:45:27.3995924Z + ['apple', 'pear']
+2026-09-24T16:45:27.3996253Z 
+2026-09-24T16:45:27.3996679Z ----------------------------------------------------------------------
+2026-09-24T16:45:27.3997121Z Ran 18 tests in 0.002s
+2026-09-24T16:45:27.3997302Z 
+2026-09-24T16:45:27.3997472Z FAILED (failures=1)
+2026-09-24T16:45:27.4059695Z ##[error]Process completed with exit code 1.
