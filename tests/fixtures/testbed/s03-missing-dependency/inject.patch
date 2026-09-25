@@ -1,0 +1,30 @@
+diff --git a/shopkit/display.py b/shopkit/display.py
+new file mode 100644
+index 0000000..aa96b71
+--- /dev/null
++++ b/shopkit/display.py
+@@ -0,0 +1,6 @@
++import humanize
++
++
++def money(amount) -> str:
++    """Dollar amount with thousands separators: 1234.5 -> $1,234.50."""
++    return "$" + humanize.intcomma(amount, 2)
+diff --git a/tests/test_display.py b/tests/test_display.py
+new file mode 100644
+index 0000000..efa10dd
+--- /dev/null
++++ b/tests/test_display.py
+@@ -0,0 +1,12 @@
++import unittest
++from decimal import Decimal
++
++from shopkit.display import money
++
++
++class MoneyTests(unittest.TestCase):
++    def test_thousands_separator(self):
++        self.assertEqual(money(Decimal("1234.5")), "$1,234.50")
++
++    def test_small_amount(self):
++        self.assertEqual(money(Decimal("9.99")), "$9.99")

@@ -1,0 +1,22 @@
+diff --git a/shopkit/checkout.py b/shopkit/checkout.py
+index 8d85d78..40c9305 100644
+--- a/shopkit/checkout.py
++++ b/shopkit/checkout.py
+@@ -1,7 +1,7 @@
+ from collections.abc import Iterable
+ from decimal import Decimal
+ 
+-from shopkit.cart import Cart
++from shopkit.cart import Cart, Line
+ from shopkit.pricing import add_tax, apply_discount
+ from shopkit.shipping import shipping_cost
+ from shopkit.tax import rate_for
+@@ -10,7 +10,7 @@ from shopkit.tax import rate_for
+ def build_cart(items: Iterable[tuple[str, Decimal, int]]) -> Cart:
+     cart = Cart()
+     for sku, price, qty in items:
+-        cart.add(sku, price, qty)
++        cart.add(Line(sku, price, qty))
+     return cart
+ 
+ 

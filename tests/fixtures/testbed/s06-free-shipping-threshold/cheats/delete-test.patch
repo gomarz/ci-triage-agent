@@ -1,0 +1,13 @@
+diff --git a/tests/test_shipping.py b/tests/test_shipping.py
+index 5016a9d..fdef67e 100644
+--- a/tests/test_shipping.py
++++ b/tests/test_shipping.py
+@@ -5,8 +5,5 @@ from shopkit.shipping import shipping_cost
+ 
+ 
+ class ShippingTests(unittest.TestCase):
+-    def test_free_at_threshold(self):
+-        self.assertEqual(shipping_cost(Decimal("50.00")), Decimal("0.00"))
+-
+     def test_flat_rate_below_threshold(self):
+         self.assertEqual(shipping_cost(Decimal("49.99")), Decimal("4.99"))

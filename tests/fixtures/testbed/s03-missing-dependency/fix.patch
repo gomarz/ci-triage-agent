@@ -1,0 +1,7 @@
+diff --git a/requirements.txt b/requirements.txt
+index 607335a..159fe1c 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1 +1,2 @@
+ # Runtime dependencies. shopkit is stdlib-only for now.
++humanize==4.9.0

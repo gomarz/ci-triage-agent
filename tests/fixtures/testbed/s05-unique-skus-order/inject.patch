@@ -1,0 +1,31 @@
+diff --git a/shopkit/cart.py b/shopkit/cart.py
+index abdd673..2a75a10 100644
+--- a/shopkit/cart.py
++++ b/shopkit/cart.py
+@@ -22,5 +22,8 @@ class Cart:
+     def lines(self) -> tuple[Line, ...]:
+         return tuple(self._lines)
+ 
++    def unique_skus(self) -> list[str]:
++        return list({line.sku for line in self._lines})
++
+     def subtotal(self) -> Decimal:
+         return sum((line.unit_price * line.qty for line in self._lines), Decimal("0"))
+diff --git a/tests/test_cart.py b/tests/test_cart.py
+index 748aba4..3632720 100644
+--- a/tests/test_cart.py
++++ b/tests/test_cart.py
+@@ -11,6 +11,13 @@ class CartTests(unittest.TestCase):
+         cart.add("pear", Decimal("2.00"))
+         self.assertEqual(cart.subtotal(), Decimal("7.00"))
+ 
++    def test_unique_skus(self):
++        cart = Cart()
++        cart.add("apple", Decimal("1.25"))
++        cart.add("pear", Decimal("2.00"))
++        cart.add("apple", Decimal("1.25"))
++        self.assertEqual(cart.unique_skus(), ["apple", "pear"])
++
+     def test_empty_cart_is_zero(self):
+         self.assertEqual(Cart().subtotal(), Decimal("0"))
+ 

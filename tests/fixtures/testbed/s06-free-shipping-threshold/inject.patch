@@ -1,0 +1,25 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index d5a5481..7359fcd 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- Free shipping now starts at $75, up from $50.
++
+ ## 0.1.0
+ 
+ - Discounts round half up to the cent.
+diff --git a/shopkit/shipping.py b/shopkit/shipping.py
+index c41a1b2..8f6981b 100644
+--- a/shopkit/shipping.py
++++ b/shopkit/shipping.py
+@@ -1,6 +1,6 @@
+ from decimal import Decimal
+ 
+-FREE_SHIPPING_MIN = Decimal("50.00")
++FREE_SHIPPING_MIN = Decimal("75.00")
+ FLAT_RATE = Decimal("4.99")
+ 
+ 

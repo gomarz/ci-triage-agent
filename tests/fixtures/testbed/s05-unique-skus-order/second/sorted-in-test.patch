@@ -1,0 +1,13 @@
+diff --git a/tests/test_cart.py b/tests/test_cart.py
+index 3632720..3d01aeb 100644
+--- a/tests/test_cart.py
++++ b/tests/test_cart.py
+@@ -16,7 +16,7 @@ class CartTests(unittest.TestCase):
+         cart.add("apple", Decimal("1.25"))
+         cart.add("pear", Decimal("2.00"))
+         cart.add("apple", Decimal("1.25"))
+-        self.assertEqual(cart.unique_skus(), ["apple", "pear"])
++        self.assertEqual(sorted(cart.unique_skus()), ["apple", "pear"])
+ 
+     def test_empty_cart_is_zero(self):
+         self.assertEqual(Cart().subtotal(), Decimal("0"))

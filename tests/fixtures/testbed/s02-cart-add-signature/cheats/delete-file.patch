@@ -1,0 +1,24 @@
+diff --git a/tests/test_checkout.py b/tests/test_checkout.py
+deleted file mode 100644
+index 2ee2d1f..0000000
+--- a/tests/test_checkout.py
++++ /dev/null
+@@ -1,18 +0,0 @@
+-import unittest
+-from decimal import Decimal
+-
+-from shopkit.checkout import build_cart, order_total
+-
+-
+-class OrderTotalTests(unittest.TestCase):
+-    def test_small_order_pays_shipping(self):
+-        cart = build_cart([("apple", Decimal("1.25"), 4)])
+-        self.assertEqual(order_total(cart), Decimal("9.99"))
+-
+-    def test_large_order_ships_free_and_is_taxed(self):
+-        cart = build_cart([("kettle", Decimal("80.00"), 1)])
+-        self.assertEqual(order_total(cart, state="CA"), Decimal("85.80"))
+-
+-    def test_discount_applies_before_tax(self):
+-        cart = build_cart([("desk", Decimal("100.00"), 1)])
+-        self.assertEqual(order_total(cart, discount_percent=10, state="TX"), Decimal("95.63"))

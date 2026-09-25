@@ -1,0 +1,46 @@
+diff --git a/shopkit/cart.py b/shopkit/cart.py
+index abdd673..d3d672c 100644
+--- a/shopkit/cart.py
++++ b/shopkit/cart.py
+@@ -13,10 +13,10 @@ class Cart:
+     def __init__(self) -> None:
+         self._lines: list[Line] = []
+ 
+-    def add(self, sku: str, unit_price: Decimal, qty: int = 1) -> None:
+-        if qty < 1:
++    def add(self, line: Line) -> None:
++        if line.qty < 1:
+             raise ValueError("qty must be at least 1")
+-        self._lines.append(Line(sku, unit_price, qty))
++        self._lines.append(line)
+ 
+     @property
+     def lines(self) -> tuple[Line, ...]:
+diff --git a/tests/test_cart.py b/tests/test_cart.py
+index 748aba4..daff835 100644
+--- a/tests/test_cart.py
++++ b/tests/test_cart.py
+@@ -1,14 +1,14 @@
+ import unittest
+ from decimal import Decimal
+ 
+-from shopkit.cart import Cart
++from shopkit.cart import Cart, Line
+ 
+ 
+ class CartTests(unittest.TestCase):
+     def test_subtotal_sums_lines(self):
+         cart = Cart()
+-        cart.add("apple", Decimal("1.25"), 4)
+-        cart.add("pear", Decimal("2.00"))
++        cart.add(Line("apple", Decimal("1.25"), 4))
++        cart.add(Line("pear", Decimal("2.00")))
+         self.assertEqual(cart.subtotal(), Decimal("7.00"))
+ 
+     def test_empty_cart_is_zero(self):
+@@ -16,4 +16,4 @@ class CartTests(unittest.TestCase):
+ 
+     def test_rejects_zero_quantity(self):
+         with self.assertRaises(ValueError):
+-            Cart().add("apple", Decimal("1.25"), 0)
++            Cart().add(Line("apple", Decimal("1.25"), 0))

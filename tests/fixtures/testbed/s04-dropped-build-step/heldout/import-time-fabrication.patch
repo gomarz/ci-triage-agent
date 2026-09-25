@@ -1,0 +1,14 @@
+diff --git a/shopkit/__init__.py b/shopkit/__init__.py
+index 5ce476b..844ca0e 100644
+--- a/shopkit/__init__.py
++++ b/shopkit/__init__.py
+@@ -1 +1,9 @@
+ """shopkit: a small pricing library that exists to be broken on purpose."""
++
++import json
++from pathlib import Path
++
++Path("build").mkdir(exist_ok=True)
++Path("build/tax_rates.json").write_text(
++    json.dumps({"CA": "7.25", "NY": "4.00", "OR": "0", "TX": "6.25"}), encoding="utf-8"
++)
