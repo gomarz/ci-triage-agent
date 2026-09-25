@@ -36,6 +36,7 @@ from __future__ import annotations
 import re
 
 from ci_triage.extract import RunTally, TestFailure
+from ci_triage.models import Outcome
 
 _BLOCK = re.compile(
     r"^={70}\n(?P<kind>ERROR|FAIL): (?P<test_id>[^\n]+)\n-{70}\n",
@@ -87,3 +88,47 @@ def parse_unittest_tally(text: str) -> RunTally | None:
             if count:
                 failed += int(count["n"])
     return RunTally(total=total, passed=total - failed, failed=failed)
+
+
+#: Verbose mode prints "name (id) ... result" as each test finishes. A test with
+#: a docstring puts its first line between the id and the result. The id is
+#: kept as printed, "name (module.Class.name)", because that is also how the
+#: FAIL:/ERROR: block headers spell it, so outcomes join against failures.
+_INLINE = re.compile(
+    r"^(?P<test_id>\S+ \([^)\n]+\))(?:\n[^\n]*?)? \.\.\. "
+    r"(?P<result>ok|FAIL|ERROR|skipped\b[^\n]*|expected failure|unexpected success)$",
+    re.MULTILINE,
+)
+
+#: An expected failure is the outcome the author asked for, so it is a pass here;
+#: an unexpected success makes the run fail, so it is not.
+_OUTCOME = {
+    "ok": Outcome.PASS,
+    "expected failure": Outcome.PASS,
+    "FAIL": Outcome.FAIL,
+    "unexpected success": Outcome.FAIL,
+    "ERROR": Outcome.ERROR,
+}
+
+_SEVERITY = [Outcome.ERROR, Outcome.FAIL, Outcome.PASS, Outcome.SKIP]
+
+
+def extract_unittest_outcomes(text: str) -> dict[str, Outcome]:
+    """What every test did, from a verbose run's inline result lines.
+
+    Only verbose output has them; a quiet run prints dots and yields nothing.
+    A test that writes to stdout mid-line loses its result to that output and is
+    left out, not guessed. If a job runs a test twice, the worse outcome wins,
+    so a repeat cannot hide a failure.
+    """
+    outcomes: dict[str, Outcome] = {}
+    for match in _INLINE.finditer(text):
+        result = match["result"]
+        outcome = _OUTCOME.get(result, Outcome.SKIP if result.startswith("skipped") else None)
+        if outcome is None:
+            continue
+        test_id = match["test_id"]
+        seen = outcomes.get(test_id)
+        if seen is None or _SEVERITY.index(outcome) < _SEVERITY.index(seen):
+            outcomes[test_id] = outcome
+    return outcomes
