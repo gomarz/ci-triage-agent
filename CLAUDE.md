@@ -7,7 +7,8 @@ Agentic triage for CI failures: ingest, cluster, propose verified fixes.
 1. **Ingest** — fetch GitHub Actions runs and job logs. *Built.*
 2. **Cluster** — group failures by root cause. *Built.*
 3. **Classify** — regression / flake / environment / infrastructure. *Rules
-   built; flake needs passing runs the corpus lacks.*
+   built; flake detected from run history (`flake.py`), which only the
+   testbed corpus has.*
 4. **Propose and verify** — patch, re-run, score. *Not built.*
 
 Stage 4 is the point of the project. Grouping failures is a solved
@@ -69,6 +70,7 @@ export DATA_DIR=data/testbed
 python -m ci_triage.ingest --repo gomarz/ci-triage-testbed --include-passing
 python scripts/fetch_logs.py --all-runs      # passing runs too, jobs fetched whole
 python scripts/cluster_preview.py --roots
+python scripts/flake_preview.py              # tests that passed and failed on one commit
 ```
 
 Ingest defaults are unchanged: failures only, one page of 100, `TARGET_REPO`.
@@ -104,9 +106,21 @@ regression, 33 environment. Accuracy against labels is unmeasured.
 `should be` is not a mismatch signal: Robot uses it for "captured stderr
 should be empty" and inside its own status wrapper.
 
-FLAKE is never assigned. It needs the same test failing and passing on one
-commit. All 100 cached runs are failures on attempt 1, and commits with
-several runs are different workflows, not reruns. See `classify.FLAKE_LIMITS`.
+No rule assigns FLAKE, because no root sentence can: `Lists differ` is a
+regression on a changed commit and a flake on an unchanged one. History does.
+`flake.find_flakes` looks for a test that passed in one job and failed in
+another of the same (commit, workflow, job name), reading verbose unittest's
+per-test result lines. `classify(failure, flaky=True)` takes that verdict and
+it outranks the root rules. Job name is in the key so a matrix cell that fails
+only on Windows is not a flake. `python scripts/flake_preview.py` reports it.
+
+On the testbed it finds exactly one: s05's `test_unique_skus`, failing 5 of 9
+runs of one commit, which wording alone calls a regression. On the Robot corpus
+it finds none, and the reason is measurable: 53 jobs have per-test results, in
+53 groups, none with a second job to compare. What it cannot see: Robot logs
+(not parsed), a failure that was re-run and passed (only the latest attempt is
+cached), and a test that prints to stdout mid-result-line (left out, not
+guessed). See `classify.FLAKE_LIMITS` and the `flake.py` docstring.
 
 ## Gotchas that cost real time
 
@@ -183,4 +197,7 @@ which is what makes cheat-rate measurable rather than aspirational. The same
 repo can measure classification accuracy: seed a known missing dependency, a
 known assertion change, a known flake, and check the category.
 
-Flake detection needs passing runs; the current corpus has none.
+Flake detection is built. Accuracy against the testbed's labels is the next
+measurement: run every seed through parse, classify and flake detection, and
+compare with `seeds/manifest.json`. Recovering re-run attempts
+(`/runs/{id}/attempts/{n}`) would stop a re-run failure from vanishing.
