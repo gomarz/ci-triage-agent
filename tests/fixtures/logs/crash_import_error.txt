@@ -1,0 +1,17 @@
+﻿2026-06-17T14:02:10.5834905Z Current runner version: '2.335.1'
+2026-06-17T14:02:17.2869304Z 
+2026-06-17T14:02:17.2881846Z Successfully installed attrs-26.1.0 docutils-0.23 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 referencing-0.37.0 rpds-py-2026.5.1 typing_extensions-4.15.0
+2026-06-17T14:02:18.8266426Z Traceback (most recent call last):
+2026-06-17T14:02:18.8275696Z   File "/home/runner/work/robotframework/robotframework/utest/run.py", line 101, in <module>
+2026-06-17T14:02:18.8276307Z     tests = get_tests(args.directory)
+2026-06-17T14:02:18.8276887Z   File "/home/runner/work/robotframework/robotframework/utest/run.py", line 57, in get_tests
+2026-06-17T14:02:18.8277485Z     tests.extend(get_tests(fullname))
+2026-06-17T14:02:18.8277780Z                  ~~~~~~~~~^^^^^^^^^^
+2026-06-17T14:02:18.8278662Z   File "/home/runner/work/robotframework/robotframework/utest/run.py", line 68, in get_tests
+2026-06-17T14:02:18.8279232Z     module = __import__(modname)
+2026-06-17T14:02:18.8279837Z   File "/home/runner/work/robotframework/robotframework/utest/running/test_docstring.py", line 4, in <module>
+2026-06-17T14:02:18.8280677Z     from robot.utils.asserts import assert_equal, assert_in
+2026-06-17T14:02:18.8281511Z ImportError: cannot import name 'assert_in' from 'robot.utils.asserts' (/home/runner/work/robotframework/robotframework/utest/../src/robot/utils/asserts.py)
+2026-06-17T14:02:18.8764350Z ##[error]Process completed with exit code 1.
+2026-06-17T14:02:18.8870815Z Post job cleanup.
+2026-06-17T14:02:18.9547430Z [command]/usr/bin/git version
