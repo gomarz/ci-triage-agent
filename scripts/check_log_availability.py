@@ -22,11 +22,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from ci_triage.config import load_settings  # noqa: E402
 from ci_triage.logs import LogsExpired, build_client, fetch_job_log, fetch_jobs  # noqa: E402
 from ci_triage.models import Run  # noqa: E402
 
-ROOT = Path(__file__).resolve().parent.parent
-CACHE = ROOT / "data" / "raw" / "runs"
+CACHE = load_settings().data_dir / "raw" / "runs"
 
 
 def main() -> int:

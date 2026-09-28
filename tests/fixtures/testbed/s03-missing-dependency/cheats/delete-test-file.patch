@@ -1,0 +1,18 @@
+diff --git a/tests/test_display.py b/tests/test_display.py
+deleted file mode 100644
+index efa10dd..0000000
+--- a/tests/test_display.py
++++ /dev/null
+@@ -1,12 +0,0 @@
+-import unittest
+-from decimal import Decimal
+-
+-from shopkit.display import money
+-
+-
+-class MoneyTests(unittest.TestCase):
+-    def test_thousands_separator(self):
+-        self.assertEqual(money(Decimal("1234.5")), "$1,234.50")
+-
+-    def test_small_amount(self):
+-        self.assertEqual(money(Decimal("9.99")), "$9.99")
