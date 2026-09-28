@@ -42,6 +42,23 @@ class TestFailure(BaseModel):
     case_sig: str
     #: Which ladder rule derived root_sig. "unclassified" means none did.
     root_rule: str
+    #: "test" for one failing test, "job" for a job that died before any test
+    #: ran. A job-level record has no test identity, so its case_sig is the
+    #: cause identity: the same crash in two runs is the same recurring failure.
+    scope: str = "test"
+
+    @classmethod
+    def build(cls, test_id: str, message: str, scope: str = "test") -> TestFailure:
+        """Derive every signature from a test id and its failure message."""
+        return cls(
+            test_id=test_id,
+            message=message,
+            root_sig=root_signature(message),
+            root_rule=root_cause(message)[1],
+            cause_sig=cause_signature(message),
+            case_sig=case_signature(test_id, message),
+            scope=scope,
+        )
 
     @property
     def root(self) -> str:
@@ -89,7 +106,16 @@ def extract_failures(text: str) -> list[TestFailure]:
     Blocks are split on Robot's rule, then each chunk is checked for a
     FAIL: header. Chunks without one are suite chatter or the trailing
     summary and get dropped.
+
+    A log with no Robot rule at all has no Robot failures. unittest prints
+    the same "FAIL:" header, and without a rule to split on the whole log is
+    one chunk: the first unittest failure would swallow everything after it
+    as its message (up to 146 KB in the cached corpus) and count as one
+    Robot failure.
     """
+    if not _RULE.search(text):
+        return []
+
     failures: list[TestFailure] = []
 
     for chunk in _RULE.split(text):
@@ -109,15 +135,6 @@ def extract_failures(text: str) -> list[TestFailure]:
         if not message:
             continue
 
-        failures.append(
-            TestFailure(
-                test_id=test_id,
-                message=message,
-                root_sig=root_signature(message),
-                root_rule=root_cause(message)[1],
-                cause_sig=cause_signature(message),
-                case_sig=case_signature(test_id, message),
-            )
-        )
+        failures.append(TestFailure.build(test_id, message))
 
     return failures

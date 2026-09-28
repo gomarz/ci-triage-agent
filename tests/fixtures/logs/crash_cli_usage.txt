@@ -1,0 +1,10 @@
+﻿2026-08-31T09:54:43.7823940Z Current runner version: '2.336.0'
+2026-08-31T09:55:05.3647147Z 
+2026-08-31T09:55:05.3647213Z Running command:
+2026-08-31T09:55:05.3649094Z C:\hostedtoolcache\windows\Python\3.13.15\x64\python.exe D:\a\robotframework\robotframework\src\robot\run.py --doc Robot Framework acceptance tests --metadata interpreter:Python 3.13.15 on Windows --variable-file D:\a\robotframework\robotframework\atest\interpreter.py;C:\hostedtoolcache\windows\Python\3.13.15\x64\python.exe;Python;3.13.15 --pythonpath D:\a\robotframework\robotframework\atest\resources --output-dir D:\a\robotframework\robotframework\atest\results\Python-3.13.15-Windows --splitlog --console dotted --console-width 100 --suite-stat-level 3 --log NONE --report NONE --exclude require-py3.14 --exclude no-windows --exclude require-linux --exclude no-ci atest/robot
+2026-08-31T09:55:05.3650929Z 
+2026-08-31T09:55:06.3188577Z [ ERROR ] unknown option '--variable-file'
+2026-08-31T09:55:06.3189143Z 
+2026-08-31T09:55:06.3189238Z Try --help for usage information.
+2026-08-31T09:55:06.4317819Z ##[error]Process completed with exit code 1.
+2026-08-31T09:55:06.6251840Z Post job cleanup.

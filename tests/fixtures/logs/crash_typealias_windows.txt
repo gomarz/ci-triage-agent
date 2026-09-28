@@ -1,0 +1,37 @@
+﻿2026-08-21T10:04:08.7061437Z Current runner version: '2.336.0'
+2026-08-21T10:04:24.6353286Z 
+2026-08-21T10:04:24.6368824Z Successfully installed attrs-26.1.0 docutils-0.23 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 markdown-3.10.3 pyyaml-6.0.3 referencing-0.37.0 rpds-py-2026.6.3 typing_extensions-4.16.0
+2026-08-21T10:04:25.2500703Z Traceback (most recent call last):
+2026-08-21T10:04:25.2508667Z   File "D:\a\robotframework\robotframework\utest\run.py", line 101, in <module>
+2026-08-21T10:04:25.2509386Z     tests = get_tests(args.directory)
+2026-08-21T10:04:25.2509819Z             ^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-08-21T10:04:25.2510507Z   File "D:\a\robotframework\robotframework\utest\run.py", line 57, in get_tests
+2026-08-21T10:04:25.2511170Z     tests.extend(get_tests(fullname))
+2026-08-21T10:04:25.2511574Z                  ^^^^^^^^^^^^^^^^^^^
+2026-08-21T10:04:25.2512223Z   File "D:\a\robotframework\robotframework\utest\run.py", line 68, in get_tests
+2026-08-21T10:04:25.2512884Z     module = __import__(modname)
+2026-08-21T10:04:25.2513255Z              ^^^^^^^^^^^^^^^^^^^
+2026-08-21T10:04:25.2513941Z   File "D:\a\robotframework\robotframework\utest\api\test_deco.py", line 3, in <module>
+2026-08-21T10:04:25.2514690Z     from robot.api.deco import keyword, library
+2026-08-21T10:04:25.2515470Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\__init__.py", line 43, in <module>
+2026-08-21T10:04:25.2516331Z     from robot.rebot import rebot as rebot, rebot_cli as rebot_cli
+2026-08-21T10:04:25.2517185Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\rebot.py", line 44, in <module>
+2026-08-21T10:04:25.2517923Z     from robot.run import RobotFramework
+2026-08-21T10:04:25.2518633Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\run.py", line 46, in <module>
+2026-08-21T10:04:25.2519760Z     from robot.running.builder import TestSuiteBuilder
+2026-08-21T10:04:25.2520636Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\running\__init__.py", line 117, in <module>
+2026-08-21T10:04:25.2521423Z     from .arguments import (
+2026-08-21T10:04:25.2522522Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\running\arguments\__init__.py", line 17, in <module>
+2026-08-21T10:04:25.2523356Z     from .argumentparser import (
+2026-08-21T10:04:25.2524235Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\running\arguments\argumentparser.py", line 29, in <module>
+2026-08-21T10:04:25.2525129Z     from .argumentspec import ArgumentSpec
+2026-08-21T10:04:25.2526044Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\running\arguments\argumentspec.py", line 30, in <module>
+2026-08-21T10:04:25.2526967Z     from .argumentconverter import ArgumentConverter
+2026-08-21T10:04:25.2527883Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\running\arguments\argumentconverter.py", line 20, in <module>
+2026-08-21T10:04:25.2528749Z     from .typeconverters import UnknownConverter
+2026-08-21T10:04:25.2529598Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\running\arguments\typeconverters.py", line 33, in <module>
+2026-08-21T10:04:25.2530462Z     from .typealiasresolver import RecursiveAlias
+2026-08-21T10:04:25.2531329Z   File "D:\a\robotframework\robotframework\utest\..\src\robot\running\arguments\typealiasresolver.py", line 18, in <module>
+2026-08-21T10:04:25.2532285Z     from typing import get_args, get_origin, TypeAliasType, TypeVar, Union
+2026-08-21T10:04:25.2533242Z ImportError: cannot import name 'TypeAliasType' from 'typing' (C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\typing.py)
+2026-08-21T10:04:25.4050087Z ##[error]Process completed with exit code 1.
