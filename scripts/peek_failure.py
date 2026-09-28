@@ -17,10 +17,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from ci_triage.config import load_settings  # noqa: E402
 from ci_triage.logs import failure_regions, group_inventory, read_log  # noqa: E402
 
-ROOT = Path(__file__).resolve().parent.parent
-LOGS = ROOT / "data" / "raw" / "logs"
+LOGS = load_settings().data_dir / "raw" / "logs"
 
 RULE = "=" * 78
 
