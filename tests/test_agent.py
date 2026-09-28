@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -70,7 +71,13 @@ def ws(repo) -> Workspace:
         "../secret.txt",
         "src/../../secret.txt",
         "/etc/passwd",
-        "C:/Windows/win.ini",
+        # Only absolute on Windows: pathlib treats "C:" as an ordinary path
+        # segment on POSIX, so this resolves safely inside the sandbox there
+        # and is not a real escape attempt on that platform.
+        pytest.param(
+            "C:/Windows/win.ini",
+            marks=pytest.mark.skipif(os.name != "nt", reason="Windows-only path"),
+        ),
         ".git/config",
         "src/.git/x",
         "",
