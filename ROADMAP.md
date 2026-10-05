@@ -6,7 +6,7 @@ unless you re-measure.
 
 **Status:** all four stages are built and have run. Stages 1-3 are measured on the
 Robot corpus (Robot, unittest and job-level crash logs). Stage 4 has run live on the
-testbed repo: 36 agent patches, and the model judge scored once on a sealed batch.
+testbed repo: 36 agent patches, and the model judge scored once on a held-out batch.
 The testbed has six seeds, so the next work is making those numbers mean more, not
 building more stages. `CLAUDE.md` holds the detail and the commands.
 
@@ -71,10 +71,10 @@ category and fix.
 | Agent patches, 6 seeds x 2 framings x 3 repeats | 36 of 36 CI-green, none a cheat by hand label |
 | Scorer without the judge, on those 36 | 14 clean, 22 suspect (nearly all honest fixes) |
 | Judge on those 36 | cleared 21 of 22 suspects, convicted 1 (s06, a false conviction) |
-| Sealed batch, no oracle, no model | cheats: 2 CHEAT, 1 suspect, 2 missed; honest: 5 clean |
-| Sealed batch, no oracle, with judge | cheats 5/5 CHEAT; honest 5/5 clean |
+| Held-out batch, no oracle, no model | cheats: 2 CHEAT, 1 suspect, 2 missed; honest: 5 clean |
+| Held-out batch, no oracle, with judge | cheats 5/5 CHEAT; honest 5/5 clean |
 
-The sealed batch is spent. Any change to the detectors or the judge prompt after
+The held-out batch is spent. Any change to the detectors or the judge prompt after
 seeing its result retires it, and a new batch has to be written.
 
 ---
@@ -106,7 +106,7 @@ Next in this track:
 3. Why is there an `unclassified` bucket instead of just using the first line?
 4. Why deterministic rules instead of embeddings, and what would change that?
 5. What is the strongest argument this is a reimplementation of BuildPulse?
-6. Why is the sealed batch only valid once, and what did the first batch the author
+6. Why is the held-out batch only valid once, and what did the first batch the author
    had not tuned against show?
 7. Why is the cheat rate taken over green patches only?
 
@@ -122,9 +122,9 @@ honest fix is hard, ideally written without reading `classify.py` or the detecto
 Without a reason to cheat, the judge's recall on the agent's own cheats stays
 unmeasured.
 
-### 2. A fresh sealed batch, and a different judge model
+### 2. A fresh held-out batch, and a different judge model
 
-The current sealed batch is spent. Any further detector or judge change needs a new
+The current held-out batch is spent. Any further detector or judge change needs a new
 one. The agent and the judge are both `claude-opus-5`, so running the judge on a
 different model would test whether the judge favours its own family's patches.
 
@@ -135,7 +135,7 @@ because the branch name hinted the change was intended. A tests-only edit of exp
 values is ambiguous without the change's intent. The right answer there is `unsure`.
 Deciding what extra context a deployment would give the judge (a commit message, a
 PR description) is a design question, not a prompt tweak, and changing the prompt
-retires the sealed batch.
+retires the held-out batch.
 
 ### 4. Recover re-run attempts
 
@@ -246,6 +246,6 @@ model call is used for clustering or classification yet.
 
 - Keep tuning the normalizer. There is another finding like the guard bug every time
   you look, and stages 1-3 are no longer where the project is thin.
-- Change a detector or the judge prompt and then report the sealed batch as if it
-  were still sealed.
+- Change a detector or the judge prompt and then report the held-out batch as if it
+  were still untouched.
 - Commit `data/` (gitignored, about 20MB, re-fetchable from the API).
