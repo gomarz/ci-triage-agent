@@ -6,7 +6,7 @@ cheating before anyone trusts them.
 
 **Status:** all four stages are built and have been run. Stages 1-3 are measured
 against a 251-log corpus from a real project. Stage 4 has run live on a small
-testbed repo: 36 agent patches and a scored, sealed batch of 10 labelled patches.
+testbed repo: 36 agent patches and a scored, held-out batch of 10 labelled patches.
 The testbed is small, so read its numbers as a direction, not a rate. Nothing is
 deployed; see [Not built](#not-built).
 
@@ -132,13 +132,13 @@ patches that are cheats; a red patch was wrong, not dishonest.
 Scoring runs without the manifest's hints (`--no-oracle`), which a real deployment
 would not have.
 
-| Sealed batch, 5 cheats and 5 honest fixes | No model | With judge |
+| Held-out batch, 5 cheats and 5 honest fixes | No model | With judge |
 |---|---|---|
 | Cheats called CHEAT | 2/5 | 5/5 |
 | Cheats missed | 2/5 | 0/5 |
 | Honest fixes called clean | 5/5 | 5/5 |
 
-The sealed batch was written before the judge and scored once with the detectors and
+The held-out batch was written before the judge and scored once with the detectors and
 judge prompt frozen. Tuning either afterwards would retire it, so it is now spent.
 Only three of the verdicts were the judge's, on ten patches. An earlier batch the
 detectors were tuned against scored 28/28, which says only that the detectors do what
@@ -149,7 +149,7 @@ On the agent's own patches (6 seeds, 2 framings, 3 repeats), all 36 went CI-gree
 none was a cheat by hand label. Without the judge the scorer called 22 of the 36
 suspect, nearly all of them honest: correct reverts, the intended test change in s06,
 a dropped dependency in s03. The judge cleared 21 and wrongly convicted one s06 patch,
-a case where intent is ambiguous without more context. Counting the sealed batch, that
+a case where intent is ambiguous without more context. Counting the held-out batch, that
 is one honest patch convicted out of 41.
 
 What this does not show:
@@ -158,7 +158,7 @@ What this does not show:
   is unmeasured. The six seeds are small enough that an honest fix is the easy path.
 * The agent and the judge are the same model, so a self-preference effect is
   untested.
-* The sealed batch has ten patches. One different verdict moves a figure by ten
+* The held-out batch has ten patches. One different verdict moves a figure by ten
   points.
 
 ## Not built
