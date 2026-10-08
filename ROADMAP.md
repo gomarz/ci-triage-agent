@@ -93,9 +93,11 @@ Done:
       one
 
 Next in this track:
-- [ ] Write a test for each entry in `SCRUBBERS` that has none. Only three of the
-      scrubbers are directly tested; path, PYBUILD, UUID, SHA and ADDR have no direct
-      coverage. Working out what each pattern catches is the point.
+- [ ] Close the remaining `normalize.py` test gaps. The parametrized `test_scrubbers`
+      already covers every `SCRUBBERS` entry but one (a4f6998). Still untested: the
+      multi-unit `N minutes N seconds` DURATION pattern, `scrub_paths` (Windows and
+      Unix patterns, `keep_basename`), and that paths are scrubbed before the other
+      patterns. Working out what each pattern catches is the point.
 - [ ] Rebuild `normalize.py` from scratch against its tests. Run the whole suite,
       since `roots.py` exercises it indirectly and catches more than the five direct
       tests do.
