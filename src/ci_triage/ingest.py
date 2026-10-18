@@ -1,7 +1,8 @@
 import argparse
 
 from .config import load_settings
-from .github import cache_payload, fetch_runs, parse_run
+from .github import cache_payload, fetch_runs
+from .models import Run
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -30,7 +31,7 @@ def main(argv: list[str] | None = None) -> None:
     for payload in payloads:
         cache_payload(payload)
 
-    runs = [parse_run(p) for p in payloads]
+    runs = [Run.from_payload(p) for p in payloads]
     failed = sum(r.triageable for r in runs)
     print(f"Fetched {len(runs)} runs ({failed} failed) from {repo} into {settings.data_dir}")
 

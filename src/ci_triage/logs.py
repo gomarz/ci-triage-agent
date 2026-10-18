@@ -102,14 +102,19 @@ def fetch_job_log(client: httpx.Client, repo: str, job_id: int) -> str:
     return response.text
 
 
-def cache_log(root: Path, run_id: int, job_id: int, text: str) -> Path:
-    """Persist raw log text, mirroring the layout of data/raw/runs/.
+def log_path(data_dir: Path, run_id: int, job_id: int) -> Path:
+    """Where one job's log is cached under a corpus root (DATA_DIR)."""
+    return data_dir / "raw" / "logs" / str(run_id) / f"{job_id}.txt"
+
+
+def cache_log(data_dir: Path, run_id: int, job_id: int, text: str) -> Path:
+    """Persist raw log text under a corpus root, mirroring the layout of raw/runs/.
 
     newline="" is load-bearing on Windows. Logs from Windows runners already
     contain CRLF, and the default translating writer turns those into CRLFLF,
     which doubles every line and corrupts any line-based analysis downstream.
     """
-    path = root / "data" / "raw" / "logs" / str(run_id) / f"{job_id}.txt"
+    path = log_path(data_dir, run_id, job_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
         handle.write(text)

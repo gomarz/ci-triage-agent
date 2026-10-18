@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 
 from ci_triage import github
-from ci_triage.github import cache_payload, fetch_runs, parse_run
-from ci_triage.models import Conclusion
+from ci_triage.github import cache_payload, fetch_runs
+from ci_triage.models import Conclusion, Run
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -17,22 +17,32 @@ def runs_payload():
 
 
 def test_parses_core_fields(runs_payload):
-    run = parse_run(runs_payload[0])
+    run = Run.from_payload(runs_payload[0])
     assert run.id == 33328240167
     assert run.repo == "robotframework/robotframework"
     assert run.workflow_name == "Acceptance tests (CPython + PyPy)"
 
 
 def test_converts_conclusion_to_enum(runs_payload):
-    run = parse_run(runs_payload[0])
+    run = Run.from_payload(runs_payload[0])
     assert run.conclusion is Conclusion.FAILURE
     assert run.triageable is True
 
 
 def test_fork_run_has_different_head_repo(runs_payload):
-    run = parse_run(runs_payload[1])
+    run = Run.from_payload(runs_payload[1])
     assert run.repo == "robotframework/robotframework"
     assert run.head_repo == "Vinni82/robotframework"
+
+
+def test_missing_head_repo_falls_back_to_repo(runs_payload):
+    # Ingest once used a copy of this parser that indexed head_repository and
+    # previous_attempt_url directly and raised KeyError on these payloads.
+    payload = dict(runs_payload[0], head_repository=None)
+    del payload["previous_attempt_url"]
+    run = Run.from_payload(payload)
+    assert run.head_repo == run.repo == "robotframework/robotframework"
+    assert run.previous_attempt_url is None
 
 
 class _Response:

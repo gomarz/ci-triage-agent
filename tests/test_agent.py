@@ -125,6 +125,23 @@ def test_run_ci_reports_the_result_and_counts_calls(ws):
     assert ws.ci_runs == 1
 
 
+@pytest.mark.parametrize(
+    "error, expected",
+    [
+        (RuntimeError("testbed ci failed: no venv"), "error: CI could not be run: testbed"),
+        (subprocess.TimeoutExpired(["ci"], 900), "error: CI did not finish within 900s"),
+        (ValueError("Expecting value"), "error: CI could not be run: Expecting value"),
+    ],
+)
+def test_a_ci_harness_failure_is_a_result_not_an_exception(repo, error, expected):
+    def broken() -> dict:
+        raise error
+
+    ws = Workspace(repo, broken)
+    assert ws.execute("run_ci", {}).startswith(expected)
+    assert ws.ci_runs == 1
+
+
 # ---- the patch ----
 
 

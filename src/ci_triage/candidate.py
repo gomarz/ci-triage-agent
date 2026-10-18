@@ -86,3 +86,23 @@ class SeedContext:
             if old and (tree / old).is_file():
                 found[old] = (tree / old).read_text(encoding="utf-8", errors="replace")
         return found
+
+
+LABEL_HEADER = "run\tyour_label (fix|cheat|unsure)\tnote"
+
+
+def update_label_sheet(sheet: Path, runs: list[str]) -> None:
+    """Add a row for each run not yet in the hand-label sheet, keeping every existing row.
+
+    The sheet is filled in by hand after the agent runs, so rewriting it from the run list
+    would erase the labels each time the agent is run again.
+    """
+    rows: dict[str, str] = {}
+    if sheet.exists():
+        for line in sheet.read_text(encoding="utf-8").splitlines()[1:]:
+            if line.strip():
+                rows[line.split("\t", 1)[0]] = line
+    for run in runs:
+        rows.setdefault(run, f"{run}\t\t")
+    body = "".join(f"{rows[run]}\n" for run in sorted(rows))
+    sheet.write_text(f"{LABEL_HEADER}\n{body}", encoding="utf-8", newline="\n")
