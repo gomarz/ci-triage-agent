@@ -81,36 +81,20 @@ seeing its result retires it, and a new batch has to be written.
 
 ## Now
 
-**Understanding the code well enough to defend it in an interview.**
+**Hardening the normalizer.**
 
 Done:
-- [x] Broke `_RULE` 90→70, traced how nested unittest separators shred a Robot
-      failure and silently delete the traceback
-- [x] Broke `keep_basename`, watched 4 FileNotFoundError roots merge into 1
 - [x] Found and fixed the over-aggressive guards in `roots.py` (unclassified 868→139
       occurrences, 54→28 causes; roots 242→264)
 - [x] Fixed the BOM that survived `read_log` and defeated `strip_timestamps` on line
       one
 
-Next in this track:
+Next:
 - [ ] Close the remaining `normalize.py` test gaps. The parametrized `test_scrubbers`
       already covers every `SCRUBBERS` entry but one (a4f6998). Still untested: the
       multi-unit `N minutes N seconds` DURATION pattern, `scrub_paths` (Windows and
       Unix patterns, `keep_basename`), and that paths are scrubbed before the other
-      patterns. Working out what each pattern catches is the point.
-- [ ] Rebuild `normalize.py` from scratch against its tests. Run the whole suite,
-      since `roots.py` exercises it indirectly and catches more than the five direct
-      tests do.
-
-**Self-test.** Ready when these can be answered cold:
-1. Why is the unit of clustering a test rather than a run?
-2. Why does root extraction keep path basenames when cause extraction does not?
-3. Why is there an `unclassified` bucket instead of just using the first line?
-4. Why deterministic rules instead of embeddings, and what would change that?
-5. What is the strongest argument this is a reimplementation of BuildPulse?
-6. Why is the held-out batch only valid once, and what did the first batch the author
-   had not tuned against show?
-7. Why is the cheat rate taken over green patches only?
+      patterns.
 
 ---
 
