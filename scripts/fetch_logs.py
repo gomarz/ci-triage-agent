@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 import time
 from pathlib import Path
@@ -26,13 +25,19 @@ import httpx
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from ci_triage.config import load_settings  # noqa: E402
-from ci_triage.logs import LogsExpired, build_client, fetch_job_log, fetch_jobs  # noqa: E402
+from ci_triage.logs import (  # noqa: E402
+    LogsExpired,
+    build_client,
+    cache_log,
+    fetch_job_log,
+    fetch_jobs,
+    log_path,
+)
 from ci_triage.models import Run  # noqa: E402
 
-RAW = load_settings().data_dir / "raw"
-RUNS = RAW / "runs"
-JOBS = RAW / "jobs"
-LOGS = RAW / "logs"
+DATA = load_settings().data_dir
+RUNS = DATA / "raw" / "runs"
+JOBS = DATA / "raw" / "jobs"
 
 
 def load_runs() -> list[Run]:
@@ -63,7 +68,8 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    token = os.environ.get("GITHUB_TOKEN")
+    # Settings, not os.environ: a token kept only in .env is not in the environment.
+    token = load_settings().github_token
     if not token:
         print("GITHUB_TOKEN not set", file=sys.stderr)
         return 1
@@ -103,7 +109,7 @@ def main() -> int:
                 continue
 
             for job in wanted:
-                path = LOGS / str(run.id) / f"{job['id']}.txt"
+                path = log_path(DATA, run.id, job["id"])
                 if path.exists():
                     skipped += 1
                     continue
@@ -122,10 +128,7 @@ def main() -> int:
                     print(f"[{i}/{len(runs)}] {run.id}  {job['name'][:40]:<40} ERROR {exc}")
                     continue
 
-                path.parent.mkdir(parents=True, exist_ok=True)
-                # newline="" so CRLF from Windows runners isn't doubled to CRLFLF
-                with path.open("w", encoding="utf-8", newline="") as handle:
-                    handle.write(text)
+                cache_log(DATA, run.id, job["id"], text)
                 fetched += 1
                 total_bytes += len(text)
                 print(

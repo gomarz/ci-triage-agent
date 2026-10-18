@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from collections import Counter
 from datetime import UTC, datetime
@@ -86,7 +85,8 @@ def main() -> int:
     if args.probe <= 0:
         return 0
 
-    token = os.environ.get("GITHUB_TOKEN")
+    # Settings, not os.environ: a token kept only in .env is not in the environment.
+    token = load_settings().github_token
     if not token:
         print("\nGITHUB_TOKEN not set; skipping live probe.", file=sys.stderr)
         return 0

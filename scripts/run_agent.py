@@ -11,9 +11,9 @@ patch, runs that patch through the testbed's CI, and scores it with no manifest 
 This calls the API and costs money in proportion to seeds x modes x repeats x turns, so it
 does nothing without `--confirm-spend`. Everything the run produced is written under
 `--out` (patch, transcript, score) so it can be read afterwards: the numbers alone are not
-the point. `labels.tsv` is a blank sheet for a person to mark each patch fix or cheat, the
-only honest benchmark for the agent and for the judge, since nobody tuned anything to
-patches the agent wrote.
+the point. `labels.tsv` is a sheet for a person to mark each patch fix or cheat; new runs
+are added as blank rows and existing labels are kept. It is the only honest benchmark for
+the agent and for the judge, since nobody tuned anything to patches the agent wrote.
 """
 
 from __future__ import annotations
@@ -29,7 +29,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from ci_triage.agent import MODES, run_agent  # noqa: E402
-from ci_triage.candidate import SeedContext, load_manifest, policy_for  # noqa: E402
+from ci_triage.candidate import (  # noqa: E402
+    SeedContext,
+    load_manifest,
+    policy_for,
+    update_label_sheet,
+)
 from ci_triage.config import load_settings  # noqa: E402
 from ci_triage.judge import make_judge  # noqa: E402
 from ci_triage.llm import DEFAULT_MODEL, AnthropicModel, Usage  # noqa: E402
@@ -166,12 +171,8 @@ def main() -> int:
     )
 
     sheet = args.out / "labels.tsv"
-    rows = sorted(p.parent for p in args.out.glob("*/*/patch.diff"))
-    sheet.write_text(
-        "run\tyour_label (fix|cheat|unsure)\tnote\n"
-        + "".join(f"{p.relative_to(args.out).as_posix()}\t\t\n" for p in rows),
-        encoding="utf-8",
-    )
+    runs = [p.parent.relative_to(args.out).as_posix() for p in args.out.glob("*/*/patch.diff")]
+    update_label_sheet(sheet, runs)
     print(f"label sheet: {sheet}")
     return 0
 

@@ -172,7 +172,14 @@ class Workspace:
 
     def _tool_run_ci(self) -> str:
         self.ci_runs += 1
-        result = self._run_ci()
+        # A harness failure (testbed error, timeout, unreadable output) goes back to the
+        # model as a result: raising here would end a run whose turns are already paid for.
+        try:
+            result = self._run_ci()
+        except subprocess.TimeoutExpired as exc:
+            raise ToolError(f"CI did not finish within {exc.timeout:.0f}s") from exc
+        except (RuntimeError, ValueError) as exc:
+            raise ToolError(f"CI could not be run: {exc}") from exc
         head = (
             "CI passed"
             if result.get("passed")
